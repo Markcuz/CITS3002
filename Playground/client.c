@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
     printf("client: connecting to %s\n", s);
     
     freeaddrinfo(servinfo); // all done with this structure
+
     
     if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
         perror("recv");

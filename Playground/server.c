@@ -1,3 +1,4 @@
+
 /*
  ** server.c -- a stream socket server demo
  */
@@ -13,6 +14,7 @@
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
+
 #define PORT "3490"  // the port users will be connecting to
 #define BACKLOG 10   // how many pending connections queue will hold
 
@@ -90,10 +92,10 @@ int main(void)
         new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
         if (new_fd == -1) {
             perror("accept");
-            continue; }
-        inet_ntop(their_addr.ss_family,
-                  get_in_addr((struct sockaddr *)&their_addr),
-                  s, sizeof s);
+            continue;
+        }
+        inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr), s, sizeof s);
+        
         printf("server: got connection from %s\n", s);
         if (!fork()) { // this is the child process
             close(sockfd); // child doesn't need the listener
