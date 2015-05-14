@@ -1,18 +1,37 @@
+
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 
-typedef char* software;
-typedef char* dataType;
+//defines for certain types
+#define TEMP_DATA 1;
+#define MASS_DATA 2;
 
-Wallet wallet;
+#define MAXBUFLEN 100
+
+#define DIRECTORPORT "4950"
+#define BANKPORT "4951"
+
+#define DIRECTOR_NAME "127.0.0.1"
+#define BANK_NAME "192.168.1.2"
 
 
-int sendData(eCent payment, dataType data, Software software, Director director); //sends dataType and eCent to Director
+//Wallet wallet;
 
-int buy_eCent(); //buys (gains an eCent from the bank)
+int sendData(int payment, dataType data, software Software);//sends dataType and eCent to Director
 
-int checkDirector(Director director, dataType data); //checks Director
+int buy_eCent(void); //buys (gains an eCent from the bank)
 
-int receiveData(dataType data, director Director); //receive the data
+int checkDirector(dataType data); //checks Director
+
+int receiveData(processedSoftware* software); //receive the data
 
 
 
