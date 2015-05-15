@@ -32,4 +32,5 @@ int checkDeposit(eCent cent){
         fprintf(stderr, "talker: failed to bind socket\n");
         return 1;
     }
+    return 0;
 }

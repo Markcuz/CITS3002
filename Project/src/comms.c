@@ -108,8 +108,3 @@ int receiveData(char* port, char* receivedMessage) {
     
     return 0;
 }
-
-int main() {
-    receiveData("4950", "");
-    return 0;
-}

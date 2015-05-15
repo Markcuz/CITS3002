@@ -22,16 +22,19 @@
 #define DIRECTOR_NAME "127.0.0.1"
 #define BANK_NAME "192.168.1.2"
 
+typedef char* software;
+typedef int dataType;
+typedef char* processedSoftware;
 
 //Wallet wallet;
 
-int sendData(int payment, dataType data, software Software);//sends dataType and eCent to Director
+int sending(int payment, dataType data, software Software);//sends dataType and eCent to Director
 
 int buy_eCent(void); //buys (gains an eCent from the bank)
 
 int checkDirector(dataType data); //checks Director
 
-int receiveData(processedSoftware* software); //receive the data
+int receiving(processedSoftware* software); //receive the data
 
 
 

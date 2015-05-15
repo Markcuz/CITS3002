@@ -1,0 +1,1 @@
+gcc -std=gnu99 -Werror -Wall -pedantic -I$(pwd) -I$(pwd)/include -L$(pwd) $@ -lproject

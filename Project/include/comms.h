@@ -13,6 +13,6 @@
 
 #define MAXBUFLEN 100
 
-int send(char* port, char* hostname, char* message);
+int sendData(char* port, char* hostname, char* message);
 
-int receive(char* port, char* receivedMessage);
+int receiveData(char* port, char* receivedMessage);
