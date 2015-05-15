@@ -1,12 +1,15 @@
 #include "collector.h"
 
 int sending(int payment, int data, int Software) {
-/*
+
     //need to check the director
     checkDirector();
     
     //need to parse the string of bytes to send
     char* message;
+    
+    /* somethign to put together encrypted stirng*/
+    
     
     //sending the string
     if(sendData(DIRECTPORT, DIRECTOR_NAME, message)==0) {
@@ -16,12 +19,12 @@ int sending(int payment, int data, int Software) {
     else {
         //returning failure
         return 1;
-    }*/
+    }
     return 0;
 }
 
 int buy_eCent(void) {
-    /*
+    
     //need to parse a string here
     if(sendData(BANKPORT, BANK_NAME, message) == 0) {
         //returning success
@@ -30,7 +33,7 @@ int buy_eCent(void) {
     else {
         //returning failure
         return 1;
-    }*/
+    }
         return 0;
 }
 

@@ -13,6 +13,7 @@ all: MYLIB
 
 clean:
 	rm -f $(OBJ_FILES)
+	rm libproject.a
 
 MYLIB: 
 	cd $(DIR)/src; make
