@@ -1,5 +1,5 @@
 #include "director.h"
 
-int checkType(dataType type){
+int checkType(int type){
     return 0;
 }

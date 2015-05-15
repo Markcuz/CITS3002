@@ -13,16 +13,12 @@
 #define COLLECTORPORT "4950"
 #define MAXBUFLEN 100
 
-typedef char* software;
-typedef int dataType;
-typedef char* processedSoftware;
-
 //store some sort of a table linking datatype to analyst
 char* storage[2];
 
 //int forwardToAnalyst(dataType type, software Software, eCent payment, Collector collector);
 
-int checkType(dataType type); //checks for analyst available for data type
+int checkType(int type); //checks for analyst available for data type
 
 //int forwardToCollector(dataType type, Software software, Analyst analyst);
 

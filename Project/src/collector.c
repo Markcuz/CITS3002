@@ -1,7 +1,7 @@
 #include "collector.h"
 
-int sending(int payment, dataType data, software Software) {
-
+int sending(int payment, int data, int Software) {
+/*
     //need to check the director
     checkDirector();
     
@@ -16,11 +16,12 @@ int sending(int payment, dataType data, software Software) {
     else {
         //returning failure
         return 1;
-    }
+    }*/
+    return 0;
 }
 
 int buy_eCent(void) {
-    
+    /*
     //need to parse a string here
     if(sendData(BANKPORT, BANK_NAME, message) == 0) {
         //returning success
@@ -29,15 +30,16 @@ int buy_eCent(void) {
     else {
         //returning failure
         return 1;
-    }
+    }*/
         return 0;
 }
 
-int checkDirector(dataType type) {
+int checkDirector(int type) {
     
     return 0;
 }
 
-int receiving(processedSoftware* software) {
+int receiving(int software) {
         return 0;
 }
+

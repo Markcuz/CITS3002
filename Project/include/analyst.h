@@ -7,9 +7,9 @@ typedef char* processedSoftware;
 char* myType; // specifies what typoe fo data it analyses only
 
 
-int registerService(dataType type);
+int registerService(int type);
 
-int receiveData(int payment, dataType data); //receive data and eCent from Director
+int receiveData(int payment, int data); //receive data and eCent from Director
 
 int depositPayment(int payment); //attempts to deposit payment (bank checks integrity) FIRST
 

@@ -18,13 +18,10 @@ all: MYLIB
 clean:
 	rm -f $(OBJ_FILES)
 
-ALL: comms.o collector.o analyst.o bank.o director.o
-	@echo =========Making Source===========
-	$(COMPILER) obj/comms.o obj/analyst.o obj/bank.o obj/director.o obj/collector.o -o compiled
-
 MYLIB: 
 	@echo ======Making Library========= 
 	ar rcs libproject.a obj/comms.o obj/collector.o obj/analyst.o obj/bank.o obj/director.o
+	ranlib libproject.a
 
 comms.o: src/comms.c
 	$(COMPILER) -c -o obj/comms.o src/comms.c
