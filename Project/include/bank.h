@@ -23,4 +23,4 @@ typedef struct {
 int checkDeposit(eCent payment); // checking eCent from Analyst
 
 int givePayment(); //sends eCent to Collector
-int givePayment(); //sends eCent to Collector
+
