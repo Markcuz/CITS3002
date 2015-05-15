@@ -10,6 +10,10 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
+#include "analyst.h"
+#include "director.h"
+#include "bank.h"
+
 //defines for certain types
 #define TEMP_DATA 1;
 #define MASS_DATA 2;
