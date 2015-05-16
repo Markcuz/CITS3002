@@ -1,18 +1,28 @@
 #include <stdio.h>
+#include "comms.h"
 
-typedef char* software;
-typedef int dataType;
-typedef char* processedSoftware;
+#define BANKPORT "4951"
+#define DIRECTORPORT "4950"
 
-char* myType; // specifies what typoe fo data it analyses only
+#define DIRECTOR_NAME "127.0.0.1"
+#define BANK_NAME "192.1.1.1"
 
+char* myType; // specifies what type fo data it analyses only
 
 int registerService(int type);
 
-int receiveData(int payment, int data); //receive data and eCent from Director
+int receiveDataToProcess(void); //receive data and eCent from Director
 
-int depositPayment(int payment); //attempts to deposit payment (bank checks integrity) FIRST
+int depositPayment(char* message); //attempts to deposit payment (bank checks integrity) FIRST
 
-int returnData(); //sends the data back to the collector (through the director)
+int processData(char* message);
 
+int encrypt_AD(char* message);
+int SSL_AD(char* message);
 
+int encrypt_AD(char* payment);
+int SSL_AD(char* payment);
+
+int decrypt_BA(char* message);
+
+int decrypt_DA(char recMessage);
