@@ -1,36 +1,70 @@
-#include <bank.h>
+#include "bank.h"
 
-
-int checkDeposit(eCent cent){
-    int sockfd;
-    struct addrinfo hints, *servinfo, *p;
-    int rv;
-    int numbytes;
-
-    memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_DGRAM;
-
-
-    if ((rv = getaddrinfo(ANALYST_NAME, ANALYSTPORT, &hints, &servinfo)) != 0) {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-        return 1;
+//receives eCent and checks for integrity, replies to analyst if good, deposit else discard
+int checkDeposit(char* recMessage, char* fromName){
+    bool valid;
+    //do some analysis on the message to see if good
+    
+    
+    char* sendMessage;
+    
+    if(valid) {
+        //create some valid string
+        
+        //encrypt the message
+        
+        SSL_BA(sendMessage);
+        
+        sendData(BANKPORT, fromName, sendMessage);
+        
+        //deposit the coin (ie remove from database?)
+        
+        return 0;
     }
-
-    // loop through all the results and make a socket
-    for(p = servinfo; p != NULL; p = p->ai_next) {
-        if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                             p->ai_protocol)) == -1) {
-            perror("talker: socket");
-            continue;
-        }
-
-        break;
+    else {
+        //create some invalid string
+        
+        //encrypt the message
+        encrypt_BA(sendMessage);
+        
+        SSL_BA(sendMessage);
+        
+        sendData(BANKPORT, fromName, sendMessage);
+        
+        return 0;
     }
+    return 1;
+}
 
-     if (p == NULL) {
-        fprintf(stderr, "talker: failed to bind socket\n");
-        return 1;
+int givePayment(char* fromName) {
+    char* sendMessage;
+    
+    //some char* for the eCent
+    
+    encrypt_BC(sendMessage);
+    SSL_BC(sendMessage);
+    
+    sendData(BANKPORT, fromName, sendMessage);
+    
+}
+
+int receiveMessage() {
+    char* recMessage;
+    receiveData(BANKPORT, recMessage);
+    
+    decrypt(recMessage);
+    
+    bool deposit;
+    //some checker to see what type of request
+    
+    //the incoming message addressName
+    char* fromName;
+    
+    if(deposit) {
+        checkDeposit(message, fromName);
     }
-    return 0;
+    
+    else {
+        givePayment(fromName);
+    }
 }

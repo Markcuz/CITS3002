@@ -10,8 +10,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#include "director.h"
-#include "bank.h"
+#include "comms.h"
 
 //defines for certain types
 #define TEMP_DATA 1;

@@ -76,7 +76,7 @@ int receivingData() {
 
     char* message;
     
-    //receiving on the director to collector port
+    //receiving on the director to collector port wait until has received this data
     receiveData(DIRECTPORT, message);
     
     decrypt_DC(message);
@@ -88,9 +88,9 @@ int receivingData() {
 }
 
 int receiveeCent(){
-    
     char* message;
     
+    //waits for response from bank
     receiveData(BANKPORT, message);
     
     decrypt_BC(message);

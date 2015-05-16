@@ -10,17 +10,26 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#define ANALYSTPORT "4950"
 #define BANKPORT "4951"
 
 #define ANALYST_NAME "127.0.0.3"//subject to change
 #define BANK_NAME "192.168.1.2"
+
+#include "comms.h"
+
 typedef struct {
     int identifier;
     char* owner;
 } eCent;
 
-int checkDeposit(eCent payment); // checking eCent from Analyst
+int checkDeposit(); // checking eCent from Analyst
 
 int givePayment(); //sends eCent to Collector
 
+int encrypt_BA(char* sendMessage);
+int SSL_BA(char* sendMessage);
+
+int encrypt_BC(char* sendMessage);
+int SSL_BC(char* sendMessage);
+
+int decrypt(char* recMessage);
