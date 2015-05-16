@@ -48,7 +48,7 @@ int givePayment(char* fromName) {
     
 }
 
-int receiveMessage() {
+int receiveBankMessage() {
     char* recMessage;
     receiveData(BANKPORT, recMessage);
     

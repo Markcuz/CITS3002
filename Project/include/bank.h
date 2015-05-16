@@ -33,3 +33,5 @@ int encrypt_BC(char* sendMessage);
 int SSL_BC(char* sendMessage);
 
 int decrypt(char* recMessage);
+
+int receiveBankMessage();

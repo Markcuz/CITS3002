@@ -10,16 +10,27 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#define COLLECTORPORT "4950"
+#include "comms.h"
+
+#define DIRECTORPORT "4950"
 #define MAXBUFLEN 100
 
 //store some sort of a table linking datatype to analyst
 char* storage[2];
 
-//int forwardToAnalyst(dataType type, software Software, eCent payment, Collector collector);
+int forwardingToAnalyst(char* message, char* fromName);
 
-int checkType(int type); //checks for analyst available for data type
+int checkType(char* message, char* fromName); //checks for analyst available for data type
 
-//int forwardToCollector(dataType type, Software software, Analyst analyst);
+int forwardingToCollector(char* message, char* fromName);
 
-//int addAnalyst(dataType type);
+int addAnalyst(char* message);
+
+int receiveDirectorMessage(void);
+
+int encrypt_DA(char* message);
+int SSL_DA(char* message);
+int encrypt_DC(char* message);
+int SSL_DC(char* message);
+
+int decryptMessageDirector(char* message);
