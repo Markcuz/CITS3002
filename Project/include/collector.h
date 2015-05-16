@@ -10,7 +10,6 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#include "analyst.h"
 #include "director.h"
 #include "bank.h"
 
@@ -29,16 +28,27 @@
 
 //Wallet wallet;
 
-int sending(int payment, int data, int Software);//sends dataType and eCent to Director
+int sending(int payment, int data, char* Software);//sends dataType and eCent to Director
 
 int buy_eCent(void); //buys (gains an eCent from the bank)
 
-int checkDirector(int data); //checks Director
+int checkDirector(int dataType); //checks Director
 
-int receiving(int software); //receive the data
+int receiving(void); //receive the data
 
+int encrypt_CB(char* message);
 
+int SSL_CB(char* message);
 
+int encrypt_CD(char* message);
 
+int SSL_CD(char* message);
+
+int decrypt_BC(char* message);
+
+int decrypt_DC(char* message);
+
+//splits the message into to corresponding eCent and stores it for later use
+int storeeCent(char* message);
 
 
