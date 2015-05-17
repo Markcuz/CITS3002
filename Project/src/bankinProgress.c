@@ -3,14 +3,12 @@
 //receives eCent and checks for integrity, replies to analyst if good, deposit else discard
 int checkDeposit(char* recMessage, char* fromName){
 	int retunType; //Will indicate success or failure
+	char oldID[20];
+	char centS[10];
+	strcpy(oldID,recMessage+7, 20);
+	strcpy(cID, recMessage+27, 10); 
 	
-	int centLen = strlen(recMessage) - 47;//might be 45 or 46. I'll fiddle around and fix this. Might end up making it pad out to the full 10.
-//	7 for transaction type, 20 for sender's bank ID, 20 is for the cent owner's bank ID
-	char ownID[20];
-	char centS[11];
-	strcpy(cID,recMessage+27, 20);
-	strcpy(cID, recMessage+47, centLen); 
-	centS[10] = '\0';
+	
 	int centID = atoi(centS);
 	char* sendMessage; // not initialised yet
 	
@@ -18,7 +16,7 @@ int checkDeposit(char* recMessage, char* fromName){
 	eCent cent;
 	fseek(centList, centID*sizeof(eCent), SEEK_SET);
 	fread(&cent, sizeof(eCent),1, centList);
-	if(strcmp(cent.owner, ownID)==0){ //handled the right code
+	if(strcmp(cent.owner, oldID)==0){ //handled the right code
 		fclose(centList); //won't need it again for this transaction
 		FILE *centBanked = fopen(centdepot, "r+"); //storing the eCent with the rest of the bank's cache.
 		int stash; //number of stored eCents
@@ -39,7 +37,6 @@ int checkDeposit(char* recMessage, char* fromName){
 		returnType =1;
 	}
 	
-        
         SSL_BA(sendMessage); // still going to have to do these
         
         sendData(BANKPORT, fromName, sendMessage);
@@ -49,11 +46,8 @@ int checkDeposit(char* recMessage, char* fromName){
 
 }
 
-int givePayment(char[] fromName) {
-    char* sendMessage;
-    FILE *centBanked = fopen(centdepot, "r+");
-	eCent cent;
-	
+int givePayment(char* recMessage, char* fromName) {
+	FILE *centBanked = fopen(centdepot, "r+");
 	int a;
 	fread(&a, sizeof(int),1, centBanked);
 	if(a == 0){ // Game Over. Insert coin/s to continue.
@@ -76,17 +70,22 @@ int givePayment(char[] fromName) {
 		int b = 0; //'t weren't empty before, but it sure is now.
 		fwrite(&b, sizeof(int),1,centBanked); //update
 	}
+	
+	eCent cent;
+	char ownID[20];
+	strcpy(ownID,recMessage+7, 20);
+    char* sendMessage;
 	char cents[a*11 +1]; // compilation of the eCent IDs.
 	FILE *centList = fopen(centBank, "r+"); //open the log of who owns which eCents
 	
 	for(int i=0; i<a; i++) ){
 		fread(&cent, sizeof(eCent), 1, centBanked); //get ecent from the bank's cache
-		cent.owner = fromName; //reallocating owner
+		strcpy(cent.owner, ownID, 20); //reallocating owner
 		fseek(centList, cent.identifier*(sizeof(eCent)), SEEK_SET); //looking up eCent's entry in owner table
 		fwrite(cent, sizeof(eCent), 1, centList); //update owner table
 		char tempCent[12]; //temp string for strncat
-		sprintf(tempCent, "%d\n", cent.identifier); //add eCent number to string
-		strncat(cents,tempCent);
+		sprintf(tempCent, "%d.10 \n", cent.identifier); //add eCent number to string
+		strncat(cents,tempCent, 12);
 	}
 	fclose(centBanked);
 	fclose(centList);
@@ -106,6 +105,11 @@ int givePayment(char[] fromName) {
 void econStart(){
 	FILE *centBanked = fopen(centdepot, "W");
 	FILE *centList = fopen(centBank, "W");
+	FILE *lastAcc = fopen(bankAcc, "W");
+	char banknum[20];
+	sprintf(banknum,"%d.19", 0);
+	banknum[19] = '\0';
+	fwrite(&banknum, 20, 1, lastAcc);
 	int a = 10000;
 	fwrite(&a, sizeof(int),1, centBanked);
 	for(int i =0; i < 10000; i++){ //subject to change or alteration if I get a good idea
@@ -118,7 +122,21 @@ void econStart(){
 	}
 	fclose(centBanked);
 	fclose(centList);
-		
+	fclose(lastAcc);
+}
+
+int giveAccount(){
+	FILE *lastAcc = fopen(bankAcc, "r+");
+	char[20] nID;
+	fgets(char,20,lastAcc);
+	int acnum = atoi(&nID);
+	acnum++;
+	sprintf(nID, "%d.19", acnum);
+	fseek(lastAcc,0, SEEK_SET);
+	fwrite(&nID, 20, 1, lastAcc);
+	char* sendMessage = nID;
+	encrypt_BC(sendMessage); // gotta get some encryption coded
+    SSL_BC(sendMessage);
 }
 
 int deParse(char* mesg){
@@ -127,15 +145,28 @@ int deParse(char* mesg){
 	parse[7] = '\0';
 	char an[] = "deposit";
 	char col[] ="collect";
+	char acc[] ="initial"
 	if(strcmp(parse, an) == 0){ return 0;}
 	else if(strcmp(parse, col)== 0){ return 1;}
+	else if(strcmp(parse, acc)==0){return 2;}
 	else{return -1;}
 }
-char findName(char* mesg){ //I'll fix this up soon, just want to poke about with some ideas first
-	char name[20];
-	strncpy(name, mesg+7,20); //maybe 19, depends if the '\0' is kept in the string 
-	name[19] = '\0';
-	return name;
+
+
+char *findName(char* mesg, int cas){ //I'll fix this up soon, just want to poke about with some ideas first
+	char* name;
+	char PULSR[10000];
+	int lngth = sprintf(PULSR, "%s", recMessage);
+	if(lngth == 10000){
+		name = NULL;
+		return name;
+	}// unreasonably huge server name. Possibly a DOS attack. disregard message.
+	else{ 
+		char serName[lngth - cas];
+		strncpy(serName, PULSR+cas, lngth-cas);
+		name = &serName;
+		return name;
+	}	
 }
 int receiveBankMessage() {
     char* recMessage;
@@ -147,17 +178,24 @@ int receiveBankMessage() {
     int deposit = deParse(recMessage);
     
     //the incoming message addressName
-    char fromName[20] = findName(recMessage);
+    
 	
 	
     switch(deposit){
 		case 0:
+			char* fromName = findName(recMessage, 37);
 			checkDeposit(recMessage, fromName);
-		case 1:
 			
+		case 1:
+			char* fromName = findName(recMessage, 27);
 			givePayment(fromName);
+		
+		case 2:
+			char* fromName = findName(recMessage, 7);
+			giveAccount(fromName);
 		default:
 			//send some sort of error to the sender's IP
 			//because the transaction type is not recognised.
+			// or just ignore, and wait for the resend
 	}
 }
