@@ -1,4 +1,11 @@
 ‪#‎include‬"bank.h"
+
+/**
+ * most of the send message calls are //'d out because I'm working on manual input
+ * debugging to iron out the last couple of creases.
+ */
+ 
+
 char banksID[20] = "0000000000000000000";
 void econStart(){
 	FILE *centBanked = fopen("centdepot", "w+");
