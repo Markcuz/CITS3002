@@ -174,9 +174,10 @@ char *findName(char* recMessage, int cas){ //I'll fix this up soon, just want to
 		return name;
 	}
 }
-int receiveBankMessage(char* recMessage) {
-//receiveData(BANKPORT, recMessage);
-//decrypt(recMessage);
+int receiveBankMessage() {
+	char* recMessage
+	receiveData(BANKPORT, recMessage);
+	decrypt(recMessage);
 //transaction type
 	int deposit = deParse(recMessage);
 //the incoming message addressName
