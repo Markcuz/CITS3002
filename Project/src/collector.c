@@ -19,7 +19,7 @@ char* getBankNumber(){
 	message = space;
 	fwrite(message, 20, 1, wallet);
 	fclose(wallet);
-	return message;
+	return message; 
 }
 
 
