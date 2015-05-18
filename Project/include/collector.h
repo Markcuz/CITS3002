@@ -27,13 +27,17 @@
 
 //Wallet wallet;
 
-int sending(int payment, int data, char* Software);//sends dataType and eCent to Director
+int sending(int data, char* Software);//sends dataType and eCent to Director
 
 int buy_eCent(void); //buys (gains an eCent from the bank)
 
 int checkDirector(int dataType); //checks Director
 
 int receiving(void); //receive the data
+
+int encrypt_CA(char* message);
+
+int SSL_CA(char* message);
 
 int encrypt_CB(char* message);
 
