@@ -75,7 +75,18 @@ int givePayment(char* recMessage, char* fromName) {
 		econStart();
 		centBanked = fopen("centdepot","r+");
 	}
+	char ownID[20];
+	strncpy(ownID,recMessage+7, 19);
+	ownID[19] = '\0';
+
 	int a;
+	FILE *lastAcc = fopen("bankAcc", "r+");
+	char lAc[20];
+	fgets(lAc, 20,lastAcc);
+	if((atoi(lAc) >= atoi(ownID)) && (atoi(banksID) < atoi(ownID))){
+		a =0;
+	}
+	else{return 1;}
 	fread(&a, sizeof(int),1, centBanked);
 	if(a == 0){ // Game Over. Insert coin/s to continue.
 		fclose(centBanked);
@@ -83,7 +94,7 @@ int givePayment(char* recMessage, char* fromName) {
 		char* failstring = noDosh; //gotta code something here;
 		encrypt_BC(failstring);
 		SSL_BC(failstring);
-		sendData(BankPort, fromName, failstring);
+		sendData(BANKPORT, fromName, failstring);
 		//alt = issue new(similar to econ start, but issues a new 10000 ecents
 		return 0;
 	}
@@ -101,9 +112,6 @@ int givePayment(char* recMessage, char* fromName) {
 		fwrite(&b, sizeof(int),1,centBanked); //update
 	}
 	eCent cent;
-	char ownID[20];
-	strncpy(ownID,recMessage+7, 19);
-	ownID[19] = '\0';
 	char* sendMessage;
 	char cents[a*11 +1]; // compilation of the eCent IDs.
 	FILE *centList = fopen("centBank", "r+"); //open the log of who owns which eCents
@@ -143,7 +151,7 @@ int giveAccount(char* fromName){
 	char* sendMessage = nID;
 	encrypt_BC(sendMessage); // gotta get some encryption coded
 	SSL_BC(sendMessage);
-	sendData(yaddayadda);
+	sendData(BANKPORT,fromName, sendMessage);
 	return 0;
 }
 int deParse(char* mesg){
@@ -160,24 +168,18 @@ int deParse(char* mesg){
 }
 char *findName(char* recMessage, int cas){ //I'll fix this up soon, just want to poke about with some ideas first
 	char* name;
-	char PULSR[10000];
-	int lngth = sprintf(PULSR, "%s", recMessage);
-	if(lngth == 10000){
-		name = NULL;
+	
+	int lngth = strlen(recMessage)+1;
+	char serName[lngth - cas];
+	strcpy(serName,recMessage +cas);
+	serName[-1] = '\0';
+	name = serName;
 	return name;
-	}// unreasonably huge server name. Possibly a DOS attack. disregard message.
-	else{
-		char serName[lngth - cas];
-		//strncpy(serName, PULSR+cas, lngth-cas);
-		strcpy(serName,PULSR +cas);
-		name = serName;
-		return name;
-	}
+	
 }
-int receiveBankMessage() {
-	char* recMessage
-	receiveData(BANKPORT, recMessage);
-	decrypt(recMessage);
+int receiveBankMessage(char* recMessage) {
+//receiveData(BANKPORT, recMessage);
+//decrypt(recMessage);
 //transaction type
 	int deposit = deParse(recMessage);
 //the incoming message addressName
