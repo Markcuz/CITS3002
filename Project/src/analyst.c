@@ -18,14 +18,43 @@ int receiveDataToProcess() {
     
     receiveData(DIRECTORPORT, recMessage);
     
+
+	/*
+	message Layout:
+	collector bit{eCent, BankDetail, Data);
+	Director bit{
+	[coded collector bit], 
+	[IDmarker] // some reasonably coherent string to mark the ID section.
+	collector ID
+	\n
+	director ID
+	}
+	*/
+
     decrypt_DA(recMessage);
-    char* fromName;
+    char* IDbit;//carries both server
+    char* fromDir;
     char* colMessage;
+	/*
+	char* barry = strstr(recMessage, [IDmarker]);
+	char coded[strlen(recMessage) - strlen(barry)];
+	strncpy(coded, recMessage, sizeof(coded));
+	colMessage = coded;
+	IDbit = barry+strlen([IDmarker]);
+	fromDir = strstr(barry, "\n");
+	fromDir++;	
+
+
 	decrypt_CA(colMessage);
     //splitting up the message into eCent and message (after stripping layers)
     char* payment;//format(coinID, ownerBankID)
     char* message;//DATA
-    
+    char byteCoin[30];
+	strncpy(byteCoin, colMessage, 29);
+	byteCoin[29] ='\0';
+	payment = byteCoin;
+	*/
+
     if(depositPayment(payment)==0) {
         processData(message);
         encrypt_AD(message);
@@ -56,8 +85,12 @@ int processData(char* message) {
 
 int depositPayment(char* payment) {
 	char* dpayment;
-    char bMessage[strlen(payment)+7];
-	sprintf(bMessage, "deposit%s",payment);
+	char myName[50];
+	gethostname(myName, sizeof(myName));
+	char* name = myName;
+    char bMessage[37 +strlen(name)];
+	sprintf(bMessage, "deposit%s%s",payment, name);
+	bMessage[-1] = '\0';
 	dpayment = bMessage;
     encrypt_AB(dpayment);
     SSL_AB(dpayment);
