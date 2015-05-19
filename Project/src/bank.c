@@ -221,8 +221,7 @@ decrypt(recMessage);
 			break;
 			
 		case 3:
-			fromName = banksID;
-			break;
+			return 1;
 //send some sort of error to the sender's IP
 //because the transaction type is not recognised.
 // or just ignore, and wait for the resend
