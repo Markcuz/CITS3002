@@ -19,7 +19,7 @@ char* getBankNumber(){
 	message = space;
 	fwrite(message, 20, 1, wallet);
 	fclose(wallet);
-	return message; 
+	return message;
 }
 
 
@@ -30,7 +30,17 @@ int receiveeCent(){
 	wallet = fopen("bytecoin", "r+");
 	fseek(wallet, 31, SEEK_SET);
 	decrypt_BC(message);
-	if(message == "no soup for you!"){return 1;} //or something
+	char* noDosh = "NO SOUP FOR YOU!";
+	char* badID = "Bad ID";
+	if(strcmp(message, noDosh) == 0){//or something
+	// wait a bit and try again
+		return 1;
+	}
+	else if(strcmp(message, badID) == 0){
+		// indicating badID
+		//Try again.
+	}
+		
 	char coin[12];
 	int z =0;
 	while(sizeof(strcpy(coin, message+(z*11))) == 12){
@@ -83,7 +93,7 @@ int buy_eCent() {//we can change the void to an int input to spec how many
 int sending(int data, char* message) {
 
     //need to check the director
-    if(checkDirector(3) != 0) {//someone else's problem ~Matt~
+    if(checkDirector(data) != 0) {//someone else's problem ~Matt~
         //wait for a while? until director has an analyst?
     }
     
@@ -91,7 +101,7 @@ int sending(int data, char* message) {
     /* somethign to put together encrypted stirng*/
     //adding encryption from Collector to Director (CD)
 	char myID[20];
-	char witCoin[strlen(message) + 31];
+	char witCoin[strlen(message) + 30];
 	FILE *wallet;
 	wallet = fopen("byteCoin", "r+");
 	if(wallet == NULL){
@@ -110,8 +120,9 @@ int sending(int data, char* message) {
 	fread(myID, 20, 1, wallet);
 	fwrite(witCoin, 11, 1, wallet);
 	fseek(wallet, z*(11), SEEK_CUR);
-	fread(witCoin, 10, 1, wallet);
-	sprintf(witCoin+10,"%s%s", myID, message);
+	sprintf(witCoin,"%s", myID);
+	fread(witCoin+19, 10, 1, wallet);
+	sprintf(witCoin+30,"%s", message);
 	witCoin[-1] ='\0';
 	message = witCoin;
 	encrypt_CA(message);
@@ -119,8 +130,8 @@ int sending(int data, char* message) {
 	char myname[50];
 	
 	gethostname(myname, sizeof(myname));
-	char outerLayer[strlen(message)+strlen(myname)];
-	sprintf(outerLayer, "fromCol%d%s%s",data, message, myname);
+	char outerLayer[strlen(message)+strlen(myname)+9];
+	sprintf(outerLayer, "%sfromCol%d%s",myname, data, message);
 	message = outerLayer;
 	
     encrypt_CD(message);
