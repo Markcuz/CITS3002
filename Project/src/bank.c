@@ -1,4 +1,5 @@
 #include"bank.h"
+#include "comms.h"
 char banksID[20] = "0000000000000000000";
 void econStart(){
 	FILE *centBanked = fopen("centdepot", "w+");
@@ -41,8 +42,6 @@ int checkDeposit(char* recMessage, char* fromName){
 	eCent cent;
 	fseek(centList, centID*sizeof(eCent), SEEK_SET);
 	fread(&cent, sizeof(eCent),1, centList);
-
-
 	if((strcmp(cent.owner, oldID)==0) && (strcmp(cent.owner, banksID)!=0)){ //got the correct previous owner
 		strcpy(cent.owner, banksID);
 		fseek(centList, centID*sizeof(eCent), SEEK_SET);
@@ -64,8 +63,8 @@ int checkDeposit(char* recMessage, char* fromName){
 		char decline[] = "You dun goofed, son.";//something something Nack message;
 		sendMessage = decline;
 	}
-	SSL_BA(sendMessage); // still going to have to do these
-	sendData(BANKPORT, fromName, sendMessage);
+//	SSL_BA(sendMessage); // still going to have to do these
+//	sendData(BANKPORT, fromName, sendMessage);
 	printf("%s\n", sendMessage);
 	return 0;
 }
@@ -84,26 +83,29 @@ int givePayment(char* recMessage, char* fromName) {
 	ownID[19] = '\0';
 	printf("%s\n", ownID);
 	int a =0;
-	int zz =0;
+	
 	FILE *lastAcc = fopen("bankAcc", "r+");
 	int lAc;
 	fread(&lAc,sizeof(int), 1 ,lastAcc);
 	int b = atoi(ownID);
 	int c = atoi(banksID);
 	if(lAc>= b && c < b){
-		zz =1;
-		printf("placeholder%d\n",zz);
+		a=a;
 	}
-	else{return 0;}
+	else{
+		char* badID = "Bad ID";
+//		sendData(BANKPORT, fromName, badID);
+		printf("%s\n",badID);
+		return 0;
+	}
 	fread(&a, sizeof(int), 1, centBanked);
 	if(a == 0){ // Game Over. Insert coin/s to continue.
 		fclose(centBanked);
 		char noDosh[] = "No soup for you!";
 		char* failstring = noDosh; //gotta code something here;
-		printf("%s\n", failstring);
-		encrypt_BC(failstring);
-		SSL_BC(failstring);
-		sendData(BANKPORT, fromName, failstring);
+//		encrypt_BC(failstring);
+//		SSL_BC(failstring);
+//		sendData(BANKPORT, fromName, failstring);
 		//alt = issue new(similar to econ start, but issues a new 10000 ecents
 		return 0;
 	}
@@ -127,7 +129,6 @@ int givePayment(char* recMessage, char* fromName) {
 	FILE *centList = fopen("centBank", "r+"); //open the log of who owns which eCents
 	for(int i=0; i<a; i++){
 		fread(&cent, sizeof(eCent), 1, centBanked); //get ecent from the bank's cache
-		printf("%s\n%d\n", cent.owner, cent.identifier);
 		strcpy(cent.owner, ownID); //reallocating owner
 		fseek(centList, (cent.identifier*(sizeof(eCent))), SEEK_SET); //looking up eCent's entry in owner table
 		
@@ -141,14 +142,14 @@ int givePayment(char* recMessage, char* fromName) {
 	fclose(centBanked);
 	fclose(centList);
 	sendMessage = cents;
-	encrypt_BC(sendMessage); // gotta get some encryption coded
-	SSL_BC(sendMessage);
-	sendData(BANKPORT, fromName, sendMessage);
-	printf("%s\ncent\n", sendMessage);
+//	encrypt_BC(sendMessage); // gotta get some encryption coded
+//	SSL_BC(sendMessage);
+//	sendData(BANKPORT, fromName, sendMessage);
 	return 0;
 }
 
 int giveAccount(char* fromName){
+	printf("%s\n", fromName);
 	FILE *lastAcc = fopen("bankAcc", "r+");
 	if(lastAcc == NULL){
 		econStart();
@@ -167,10 +168,9 @@ int giveAccount(char* fromName){
 	fread(&nID,sizeof(int), 1, lastAcc);
 	printf("lastacc%d\n", nID);
 	char* sendMessage = acnum;
-	encrypt_BC(sendMessage); // gotta get some encryption coded
-	SSL_BC(sendMessage);
-	sendData(BANKPORT,fromName, sendMessage);
-	printf("%s\n", sendMessage);
+//	encrypt_BC(sendMessage); // gotta get some encryption coded
+//	SSL_BC(sendMessage);
+//	sendData(BANKPORT,fromName, sendMessage);
 	return 0;
 }
 int deParse(char* mesg){
@@ -196,36 +196,51 @@ char *findName(char* recMessage, int cas){ //I'll fix this up soon, just want to
 	return name;
 	
 }
-int receiveBankMessage() {
-receiveData(BANKPORT, recMessage);
-decrypt(recMessage);
-
+int receiveBankMessage(char* recMessage) {
+//receiveData(BANKPORT, recMessage);
+//decrypt(recMessage);
+//transaction type
 	int deposit = deParse(recMessage);
 //the incoming message addressName
 	char* fromName;
-	switch(deposit){
-		case 0:
+	if(deposit == 0){
 			fromName = findName(recMessage, 36);
+			char fd[strlen(fromName)];
+			strcpy(fd, fromName);
+			fromName = fd;
 			checkDeposit(recMessage, fromName);
-			break;
-			
-		case 1:
+			return 0;
+	}
+	else if(deposit ==1){
 			fromName = findName(recMessage, 26);
-			printf("%s\n", fromName);	
+			printf("%s\n", fromName);
+			char f1[strlen(fromName)];
+			strcpy(f1, fromName);
+			fromName = f1;	
 			givePayment(recMessage, fromName);
-			break;
-			
-		case 2:
+			return 0;
+	}
+	else if(deposit ==2){
 			fromName = findName(recMessage, 7);
+			char f2[strlen(fromName)];
+			strcpy(f2, fromName);
+			fromName = f2;
 			giveAccount(fromName);
-			break;
-			
-		case 3:
-			return 1;
+			return 0;
+	}
+	else{
+		
+		return 1;
+	}
+
 //send some sort of error to the sender's IP
 //because the transaction type is not recognised.
 // or just ignore, and wait for the resend
-	}
+	
 	return 0;
 }
 
+int main(){
+	char* out = "initialTEAPOT";
+	receiveBankMessage(out);
+}
