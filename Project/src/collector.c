@@ -1,6 +1,6 @@
 
 #include "collector.h"
-
+#include "comms.h"
 int getBankNumber(){
 	FILE *wallet;
 	char* message = "";
@@ -143,6 +143,10 @@ int sending(int data, char* message) {
 	gethostname(myname, sizeof(myname));
 	char outerLayer[strlen(message)+strlen(myname)+9];
 	sprintf(outerLayer, "%sfromCol%d%s",myname, data, message);
+/*
+	Here's the ID string: "fromCol"
+*/
+
 	message = outerLayer;
 	
 //    encrypt_CD(message);
