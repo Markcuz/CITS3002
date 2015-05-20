@@ -63,8 +63,9 @@ int checkDeposit(char* recMessage, char* fromName){
 		char decline[] = "You dun goofed, son.";//something something Nack message;
 		sendMessage = decline;
 	}
-//	SSL_BA(sendMessage); // still going to have to do these
-//	sendData(BANKPORT, fromName, sendMessage);
+	char* ssld;
+	SSL_write(ssld, sendMessage, strlen(sendMessage));
+	sendData(BANKPORT, fromName, ssld);
 	printf("%s\n", sendMessage);
 	return 0;
 }
@@ -94,7 +95,9 @@ int givePayment(char* recMessage, char* fromName) {
 	}
 	else{
 		char* badID = "Bad ID";
-//		sendData(BANKPORT, fromName, badID);
+		char* ssld;
+		SSL_write(ssld, badID, strlen(badID));
+		sendData(BANKPORT, fromName, ssld);
 		printf("%s\n",badID);
 		return 0;
 	}
@@ -102,10 +105,9 @@ int givePayment(char* recMessage, char* fromName) {
 	if(a == 0){ // Game Over. Insert coin/s to continue.
 		fclose(centBanked);
 		char noDosh[] = "No soup for you!";
-		char* failstring = noDosh; //gotta code something here;
-//		encrypt_BC(failstring);
-//		SSL_BC(failstring);
-//		sendData(BANKPORT, fromName, failstring);
+		char* failstring; //gotta code something here;
+		SSL_write(failstring, &noDosh, strlen(noDosh));
+		sendData(BANKPORT, fromName, failstring);
 		//alt = issue new(similar to econ start, but issues a new 10000 ecents
 		return 0;
 	}
@@ -141,10 +143,8 @@ int givePayment(char* recMessage, char* fromName) {
 	cents[-1] = '\0';
 	fclose(centBanked);
 	fclose(centList);
-	sendMessage = cents;
-//	encrypt_BC(sendMessage); // gotta get some encryption coded
-//	SSL_BC(sendMessage);
-//	sendData(BANKPORT, fromName, sendMessage);
+	SSL_write(sendMessage, &cents, strlen(cents));
+	sendData(BANKPORT, fromName, sendMessage);
 	return 0;
 }
 
@@ -167,10 +167,9 @@ int giveAccount(char* fromName){
 	fseek(lastAcc,0, SEEK_SET);
 	fread(&nID,sizeof(int), 1, lastAcc);
 	printf("lastacc%d\n", nID);
-	char* sendMessage = acnum;
-//	encrypt_BC(sendMessage); // gotta get some encryption coded
-//	SSL_BC(sendMessage);
-//	sendData(BANKPORT,fromName, sendMessage);
+	char* sendMessage;
+	SSL_write(sendMessage, &acnum, strlen(acnum);
+	sendData(BANKPORT,fromName, sendMessage);
 	return 0;
 }
 int deParse(char* mesg){
@@ -196,10 +195,12 @@ char *findName(char* recMessage, int cas){ //I'll fix this up soon, just want to
 	return name;
 	
 }
-int receiveBankMessage(char* recMessage) {
-//receiveData(BANKPORT, recMessage);
-//decrypt(recMessage);
+int receiveBankMessage() {
+	char* rect; // for received transmission
+	receiveData(BANKPORT, rect);
 //transaction type
+	char* recMessage;
+	SSL_read(rect, recMessage, strlen(rect));
 	int deposit = deParse(recMessage);
 //the incoming message addressName
 	char* fromName;
@@ -240,7 +241,3 @@ int receiveBankMessage(char* recMessage) {
 	return 0;
 }
 
-int main(){
-	char* out = "initialTEAPOT";
-	receiveBankMessage(out);
-}
