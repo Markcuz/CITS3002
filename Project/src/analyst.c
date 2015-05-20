@@ -1,5 +1,6 @@
 #include "analyst.h"
-
+#include "comms.h"
+int serviceType = 3; //I dunno, set this up sometime.
 int registerService(int type) {
     char* sendMessage;
     
@@ -14,55 +15,28 @@ int registerService(int type) {
 }
 
 int receiveDataToProcess() {
-    char* recMessage;
+   /* char* recMessage;
     
     receiveData(DIRECTORPORT, recMessage);
-    
-
-	/*
-	message Layout:
-	collector bit{eCent, BankDetail, Data);
-	Director bit{
-	[coded collector bit], 
-	[IDmarker] // some reasonably coherent string to mark the ID section.
-	collector ID
-	\n
-	director ID
-	}
-	*/
-
+    //parsing for the data from the director.
     decrypt_DA(recMessage);
-    char* IDbit;//carries both server
-    char* fromDir;
-    char* colMessage;
-	/*
-	char* barry = strstr(recMessage, [IDmarker]);
-	char coded[strlen(recMessage) - strlen(barry)];
-	strncpy(coded, recMessage, sizeof(coded));
-	colMessage = coded;
-	IDbit = barry+strlen([IDmarker]);
-	fromDir = strstr(barry, "\n");
-	fromDir++;	
+	    	char* collName;
+    	char* colMessage;
+	char msEnd[] = "Message_END";
+	char* dN = strstr(recMessage, msEnd);
+	char* dirName = dN+(strlen(msEnd));
+		
 
-
+	//now dealing with the message from the collector.
 	decrypt_CA(colMessage);
+	char coinN[30];
+	strcpy(coinN, colMessage);
     //splitting up the message into eCent and message (after stripping layers)
-    char* payment;//format(coinID, ownerBankID)
+    char* payment;//format(ownerBankID, coinID)
     char* message;//DATA
-    char byteCoin[30];
-	strncpy(byteCoin, colMessage, 29);
-	byteCoin[29] ='\0';
-	payment = byteCoin;
-	*/
-
+    
     if(depositPayment(payment)==0) {
         processData(message);
-        encrypt_AD(message);
-	char dirBack[strlen(message)+strlen(fromname)];
-	sprintf(dirBack, "%s%s",message, fromname);
-	message= dirBack;
-        SSL_AD(message);
-        sendData(DIRECTORPORT, DIRECTOR_NAME, message);
         return 0;
     }
     
@@ -74,43 +48,36 @@ int receiveDataToProcess() {
         SSL_AD(failHopper);
         sendData(DIRECTORPORT, DIRECTOR_NAME, failMessage);
         return 0;
-    }
+    }*/
     return 1;
 }
 
 int processData(char* message) {
+ 	char* retMes = "Totally analysed";
+	char* retEnc;
+	SSL_write(retEnc, retMes, strlen(retMes));
+	char dirBack[strlen(message)+strlen(fromname)];
+	sprintf(dirBack, "%s%s",retEnc, fromname);
+        SSL_write(message, dirBack, strlen(dirBack));
+        sendData(DIRECTORPORT, DIRECTOR_NAME, message);
+
     //processes the data then modifies message for the processed Message
     return 0;
 }
 
 int depositPayment(char* payment) {
 	char* dpayment;
-	char myName[50];
-	gethostname(myName, sizeof(myName));
-	char* name = myName;
-    char bMessage[37 +strlen(name)];
-	sprintf(bMessage, "deposit%s%s",payment, name);
-	bMessage[-1] = '\0';
-	dpayment = bMessage;
-    encrypt_AB(dpayment);
-    SSL_AB(dpayment);
-    sendData(BANKPORT, BANK_NAME, dpayment);
-    
+    char bMessage[strlen(payment)+7];
+	sprintf(bMessage, "deposit%s",payment);
+    	SSL_write(dpayment, bMessage, strlen(bMessage));
+	sendData(BANKPORT, BANK_NAME, dpayment);
+    char* allGood = "Well done you";
     char* response;
-    receiveData(BANKPORT, response);
-    
-    decrypt_BA(response);
-    
-    bool valid;
-    //read response and see if true or fale
-    
-    if(valid) {
-        return 0;
-    }
-    else {
-        return 1;
-    }
-    
+    	char* dCode;
+	receiveData(BANKPORT, response);
+	SSL_read(response, dCode, strlen(response));
+    	if(strcmp(dCode, allGood) == 0){return 0}
+	else{return 1;}    
 }
 
 
