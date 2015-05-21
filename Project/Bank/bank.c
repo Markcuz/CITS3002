@@ -4,7 +4,6 @@
 char banksID[20] = "0000000000000000000";
 
 void econStart(){
-	printf("started\n");
 	FILE *centBanked = fopen("centdepot", "w+");
 	FILE *centList = fopen("centBank", "w+");
 	FILE *lastAcc = fopen("bankAcc", "w+");
@@ -161,11 +160,8 @@ int givePayment(char* recMessage, char* fromName) {
 }
 
 int giveAccount(char* fromName){
-    fprintf(stdout, "in giveAcc fromName:..%s..", fromName);
 	FILE *lastAcc = fopen("bankAcc", "r+");
     
-    printf("..%s..", fromName);
-    /*
 	if(lastAcc == NULL){
 		econStart();
 		lastAcc = fopen("bankAcc", "r+");
@@ -183,20 +179,11 @@ int giveAccount(char* fromName){
 	fread(&nID,sizeof(int), 1, lastAcc);
 	printf("lastacc%d\n", nID);
     
-     */
-    //do we need to create the send message?
-	char* sendMessage = "hello";
-	//SSL_write(sendMessage, &acnum, strlen(acnum);
-    
-    printf("..%s..", fromName);
-    
     //sending is being a pain
-	sendData(BANKPORT,"127.0.0.1", sendMessage);
+	sendData(BANKPORT, fromName, acnum);
 	return 0;
 }
 int deParse(char* mesg){
-	printf("%s\n", mesg);
-	printf("H2\n");
 	char parse[8];
 	strncpy(parse, mesg, 7);
 	parse[7] = '\0';
@@ -214,21 +201,12 @@ int deParse(char* mesg){
         return 2;
     }
 	else{
-        printf("not found");
+        printf("Not found");
         return 3;
     }
 }
 char *findName(char* recMessage, int cas){
-    printf("received: %s\n", recMessage);
     char* name;
-	/*
-	int lngth = strlen(recMessage)+1;
-	char serName[lngth - cas];
-    
-	strncpy(serName,recMessage +cas);
-	//serName[-1] = '\0';
-	name = serName;
-	return name;*/
     
     char serName[100];
     
@@ -246,13 +224,9 @@ int receiveBankMessage() {
 	char* recMessage; // for received transmission
 	receiveData(BANKPORT, recMessage);
     	char deMec[100];
-	printf("HERE\n");
-	printf("ATTEMPT%s\n", recMessage);
 	sprintf(deMec, "%s", recMessage);
-	printf("H1\n");
 	recMessage = deMec;
 	int deposit = deParse(recMessage);
-	printf("H3\n");
 //the incoming message addressName
 	char* fromName;
 	if(deposit == 0){
@@ -265,7 +239,6 @@ int receiveBankMessage() {
 	}
 	else if(deposit ==1){
 			fromName = findName(recMessage, 26);
-			printf("%s\n", fromName);
 			char f1[strlen(fromName)];
 			strcpy(f1, fromName);
 			fromName = f1;
@@ -276,9 +249,6 @@ int receiveBankMessage() {
 			fromName = findName(recMessage, 7);
 			sprintf(deMec, "%s", fromName);
 			fromName = deMec;
-        	/*	printf("after findName fromName: %s\n", fromName);
-			printf("%s\n", deMec);
-               		printf("fromName: %s\n", fromName);*/
 			giveAccount(fromName);
 			return 0;
 	}
@@ -294,13 +264,17 @@ int receiveBankMessage() {
                   gethostname(hostname, sizeof(hostname));
                   printf("Bank Hostname: %s\n",hostname);
                   
+                 printf("Economy started\n");
                   econStart();
-                  //while(1) {
-                  if(receiveBankMessage()!=0) {
-                      return 1;
+                  printf("Economy finished\n");
+                  while(1) {
+                      if(receiveBankMessage()!=0) {
+                          printf("bad bank message");
+                          return 1;
+                      }
+                      printf("Completed Transaction! \n");
+                      printf("Bank Hostname: %s\n",hostname);
                   }
-                      //printf("Bank Hostname: %s\n",hostname);
-                  //}
                   return 0;
               }
               

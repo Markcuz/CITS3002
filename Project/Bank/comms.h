@@ -14,3 +14,5 @@
 int sendData(char* port, char* hostname, char* message);
 
 int receiveData(char* port, char* receivedMessage);
+
+int getip(char* myIP);
