@@ -1,9 +1,10 @@
+
 #include "bank.h"
 
 char banksID[20] = "0000000000000000000";
 
 void econStart(){
-
+	printf("started\n");
 	FILE *centBanked = fopen("centdepot", "w+");
 	FILE *centList = fopen("centBank", "w+");
 	FILE *lastAcc = fopen("bankAcc", "w+");
@@ -194,6 +195,8 @@ int giveAccount(char* fromName){
 	return 0;
 }
 int deParse(char* mesg){
+	printf("%s\n", mesg);
+	printf("H2\n");
 	char parse[8];
 	strncpy(parse, mesg, 7);
 	parse[7] = '\0';
@@ -242,9 +245,14 @@ char *findName(char* recMessage, int cas){
 int receiveBankMessage() {
 	char* recMessage; // for received transmission
 	receiveData(BANKPORT, recMessage);
-    
-
+    	char deMec[100];
+	printf("HERE\n");
+	printf("ATTEMPT%s\n", recMessage);
+	sprintf(deMec, "%s", recMessage);
+	printf("H1\n");
+	recMessage = deMec;
 	int deposit = deParse(recMessage);
+	printf("H3\n");
 //the incoming message addressName
 	char* fromName;
 	if(deposit == 0){
@@ -266,12 +274,11 @@ int receiveBankMessage() {
 	}
 	else if(deposit == 2){
 			fromName = findName(recMessage, 7);
-        printf("after findName fromName: %s\n", fromName);
-        /*
-        char daName[strlen(fromName)];
-			strcpy(daName, fromName);
-			fromName = daName;*/
-            printf("fromName: %s\n", fromName);
+			sprintf(deMec, "%s", fromName);
+			fromName = deMec;
+        	/*	printf("after findName fromName: %s\n", fromName);
+			printf("%s\n", deMec);
+               		printf("fromName: %s\n", fromName);*/
 			giveAccount(fromName);
 			return 0;
 	}
@@ -298,6 +305,4 @@ int receiveBankMessage() {
               }
               
               
-              
-              
-
+       
