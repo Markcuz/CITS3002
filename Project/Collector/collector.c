@@ -192,11 +192,11 @@ int checkDirector(int type) {
 
 //receiving the processed Data from the director
 int receivingData() {
-	FILE *lstData;
+	FILE *listData;
 	int list;
-	lastData = fopen("endUser", "r+");
-	if(lastData == NULL){
-		lastData = ("endUser", "w+");
+	listData = fopen("endUser", "r+");
+	if(listData == NULL){
+		listData = ("endUser", "w+");
 		list = 0;
 		fwrite(&list, sizeof(int), 1, listData);
 	}
@@ -220,7 +220,7 @@ int showData(){
 	fseek(listData, sizeof(int), SEEK_SET);
 	char buff[100];
 	while(fgets(buff, 100, listData) != NULL){
-		printf("%s\n", nuff);
+		printf("%s\n", buff);
 	}
 	return 0;
  }
