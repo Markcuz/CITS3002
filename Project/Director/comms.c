@@ -89,15 +89,17 @@ int receiveData(char* port, char* receivedMessage) {
     freeaddrinfo(servinfo);
     
     addr_len = sizeof their_addr;
-    if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,
+    if ((numbytes = recvfrom(sockfd, receivedMessage, MAXBUFLEN-1 , 0,
                              (struct sockaddr *)&their_addr, &addr_len)) == -1) {
         perror("recvfrom");
         return 1;
     }
     
-    buf[numbytes] = '\0';
-
-    receivedMessage = &buf[0];
+    printf("listener: packet is %d bytes long\n", numbytes);
+    receivedMessage[numbytes]='\0';
+    printf("listener: packet contains \"%s\"\n", receivedMessage);
+    
+    //receivedMessage = &buf[0];
     
     close(sockfd);
     

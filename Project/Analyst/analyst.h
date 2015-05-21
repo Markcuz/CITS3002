@@ -6,6 +6,9 @@
 
 #define ADD_ANALYST "add_analyst"
 
+char* directorName;
+char* bankName;
+
 char* myType; // specifies what type fo data it analyses only
 
 int registerService(int type);

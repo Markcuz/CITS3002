@@ -160,7 +160,7 @@ int givePayment(char* recMessage, char* fromName) {
 }
 
 int giveAccount(char* fromName){
-    fprintf(stdout, "hello..%s..", fromName);
+    fprintf(stdout, "in giveAcc fromName:..%s..", fromName);
 	FILE *lastAcc = fopen("bankAcc", "r+");
     
     printf("..%s..", fromName);
@@ -260,19 +260,20 @@ int receiveBankMessage() {
 			printf("%s\n", fromName);
 			char f1[strlen(fromName)];
 			strcpy(f1, fromName);
-			fromName = f1;	
+			fromName = f1;
 			givePayment(recMessage, fromName);
 			return 0;
 	}
 	else if(deposit == 2){
 			fromName = findName(recMessage, 7);
-			char daName[strlen(fromName)]
-			strcpy(daname, fromName);
-			fromName = daName;
+        printf("after findName fromName: %s\n", fromName);
+        /*
+        char daName[strlen(fromName)];
+			strcpy(daName, fromName);
+			fromName = daName;*/
             printf("fromName: %s\n", fromName);
 			giveAccount(fromName);
 			return 0;
-			
 	}
 	else {
 		return 1;
