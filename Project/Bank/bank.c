@@ -266,9 +266,13 @@ int receiveBankMessage() {
 	}
 	else if(deposit == 2){
 			fromName = findName(recMessage, 7);
+			char daName[strlen(fromName)]
+			strcpy(daname, fromName);
+			fromName = daName;
             printf("fromName: %s\n", fromName);
 			giveAccount(fromName);
 			return 0;
+			
 	}
 	else {
 		return 1;
