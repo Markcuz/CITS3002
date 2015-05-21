@@ -157,7 +157,8 @@ int givePayment(char* recMessage, char* fromName) {
     printf("fromName: %s", fromName);
     
     //WARNING changed
-	//sendData(BANKPORT, "127.0.0.1", sendMessage);
+    usleep(10000);
+	sendData(BANKPORT, "127.0.0.1", sendMessage);
 	return 0;
 }
 
