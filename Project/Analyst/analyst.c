@@ -28,9 +28,7 @@ int receiveDataToProcess() {
     char* collName = malloc(100 * sizeof(char));
     char* colMessage = malloc(100 * sizeof(char));
     
-	char msEnd[] = "Message_END";
-    
-	char* dN = strstr(recMessage, msEnd);
+	char* dN = strstr(recMessage, TO_ANALYST);
 	char* dirName = dN+(strlen(msEnd));
     
     free(recMessage);
@@ -40,7 +38,8 @@ int receiveDataToProcess() {
     //splitting up the message into eCent and message (after stripping layers)
     char* payment = malloc(100 * sizeof(char));//format(ownerBankID, coinID)
     
-    //NEED TO split into payment by no. bytes
+    //have to check this
+    strncpy(payment, recMessage,29);
     
     char* message = malloc(100 * sizeof(char));//DATA
     
@@ -83,6 +82,7 @@ int depositPayment(char* payment) {
     
 	sprintf(bMessage, "deposit%s",payment);
 	sendData(BANKPORT, bankName, dpayment);
+    
     char allGood[] = "Well done you";
     char* response = "";
 	receiveData(BANKPORT, response);

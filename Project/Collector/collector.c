@@ -101,6 +101,7 @@ int buy_eCent() {
 
 int sending(int data, char* message) {
 
+    printf("data : %d , message: %s\n", data, message);
     //need to check the director
     if(checkDirector(data) != 0) {//someone else's problem ~Matt~
         printf("not valid type");
@@ -109,7 +110,7 @@ int sending(int data, char* message) {
     }
     
     //add something to front of string to identify a data exchange
-    /* somethign to put together encrypted stirng*/
+    // somethign to put together encrypted stirng
     //adding encryption from Collector to Director (CD)
 	char myID[20];
 	char witCoin[strlen(message) + 30];
@@ -137,16 +138,12 @@ int sending(int data, char* message) {
 	sprintf(witCoin+30,"%s", message);
 	witCoin[-1] ='\0';
 	message = witCoin;
-//	encrypt_CA(message);
-//	SSL_CA(message);
 	char myname[50];
 	
 	gethostname(myname, sizeof(myname));
 	char outerLayer[strlen(message)+strlen(myname)+9];
-	sprintf(outerLayer, "%sfromCol%d%s",myname, data, message);
-/*
-	Here's the ID string: "fromCol"
-*/
+	sprintf(outerLayer, "%sto_analyst%d%s",myname, data, message);
+
 
 	message = outerLayer;
     
@@ -159,6 +156,7 @@ int sending(int data, char* message) {
         //returning failure
         return 1;
     }
+     
     return 0;
 }
 
@@ -168,14 +166,14 @@ int checkDirector(int type) {
     gethostname(myName, sizeof(myName));
 
     char* message;
-    sprintf(message, "%d%s%s", type, TO_ANALYST, myName);
+    sprintf(message, "%d%s%s", type, CHECK_TYPE, myName);
   
     sendData(DIRECTORPORT, directorName, message);
     usleep(10000);
     
     char recMesg[100];
     receiveData(DIRECTORPORT, recMesg);
-//	SSL_read(recMesg, decMesg);
+    printf("directors reply: %s\n", recMesg);
 	
 	char sucS[] = "success";
 	if(strcmp(recMesg, sucS) == 0){
@@ -244,6 +242,7 @@ int main(int argc, char* argv[]) {
         buy_eCent();
     }
 
+    usleep(10000);
     int type;
     char* message = malloc(100*sizeof(char));
     
@@ -254,7 +253,7 @@ int main(int argc, char* argv[]) {
         scanf("%s", message);
         
         printf("Sending...\n\n");
-        //sending(type, message);
+        sending(type, message);
         continue;
     }
     

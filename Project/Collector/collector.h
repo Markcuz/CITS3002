@@ -18,6 +18,7 @@
 #define BANKPORT "4951"
 
 #define TO_ANALYST "to_analyst"
+#define CHECK_TYPE "check_type"
 
 char* directorName;
 char* bankName;
