@@ -93,7 +93,7 @@ int givePayment(char* recMessage, char* fromName) {
 	char ownID[20];
 	strncpy(ownID,recMessage+7, 19);
 	ownID[19] = '\0';
-	printf("%s\n", ownID);
+	printf("checkingthisworks\n%s\n", ownID);
 	int a =0;
 	
 	FILE *lastAcc = fopen("bankAcc", "r+");
