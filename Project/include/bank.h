@@ -15,6 +15,7 @@
 #define ANALYST_NAME "127.0.0.3"//subject to change
 #define BANK_NAME "192.168.1.2"
 
+//format sendMessage: <
 #include "comms.h"
 
 typedef struct {
