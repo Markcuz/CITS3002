@@ -196,7 +196,7 @@ int receivingData() {
 	int list;
 	listData = fopen("endUser", "r+");
 	if(listData == NULL){
-		listData = ("endUser", "w+");
+		listData = fopen("endUser", "w+");
 		list = 0;
 		fwrite(&list, sizeof(int), 1, listData);
 	}
