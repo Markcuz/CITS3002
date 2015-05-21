@@ -239,17 +239,15 @@ int receiveBankMessage() {
 	char* fromName;
 	if(deposit == 0){
 			fromName = findName(recMessage, 36);
-			char fd[strlen(fromName)];
-			strcpy(fd, fromName);
-			fromName = fd;
+			sprintf(deMec, "%s", fromName);
+			fromName = deMec;
 			checkDeposit(recMessage, fromName);
 			return 0;
 	}
 	else if(deposit ==1){
 			fromName = findName(recMessage, 26);
-			char f1[strlen(fromName)];
-			strcpy(f1, fromName);
-			fromName = f1;
+			sprintf(deMec, "%s", fromName);
+			fromName = deMec;
 			givePayment(recMessage, fromName);
 			return 0;
 	}
