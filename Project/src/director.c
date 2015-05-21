@@ -3,7 +3,7 @@
 //expecting message: <type> <data> <identifier> <collectorHostname>
 int forwardingToAnalyst(char* recMessage){
     
-    FILE* table;
+    /*FILE* table;
     ssize_t read;
     size_t len = 0;
     char* toName;
@@ -20,8 +20,8 @@ int forwardingToAnalyst(char* recMessage){
     
     char* sendMessage;
     sendMessage = strstr(recMessage, TO_ANALYST);
-    
-    sendData(DIRECTORPORT, toName, recMessage++);
+    */
+    //sendData(DIRECTORPORT, toName, recMessage++);
     return 0;
 }
 
@@ -48,14 +48,14 @@ int checkType(char* message){
         char retMessage[10];
         //create some message to tell available
         retMessage = "avail"
-        sendData(DIRECTORPORT, fromName, retMessage);
+        //sendData(DIRECTORPORT, fromName, retMessage);
         return 0;
     }
     else {
         char retMessage[10];
         //create some message to tell unavailable
         retMessage = "notAvail";
-        sendData(DIRECTORPORT, fromName, retMessage);
+        //sendData(DIRECTORPORT, fromName, retMessage);
         return 0;
     }
     
@@ -81,7 +81,7 @@ int forwardingToCollector(char* recMessage) {
     }
     */
     //figure out who to send to via message
-    sendData(DIRECTORPORT, toName, recMessage);
+    //sendData(DIRECTORPORT, toName, recMessage);
     return 0;
 }
 
@@ -133,11 +133,15 @@ int deParseMessage(char* recMessage) {
 }
 
 int receiveDirectorMessage() {
-    char* recMessage;
+    char* recMessage = "cadd_analystmyHostname";
+    fprintf(stdout, "incoming message: %s", recMessage);
     char* fromName;
     
-    receiveData(DIRECTORPORT, recMessage);
+    //receiveData(DIRECTORPORT, recMessage);
     int messageType = deParseMessage(recMessage);
+    
+    fprintf(stdout, "type: %d", messageType);
+    
     switch(messageType) {
         case 0:
             forwardingToCollector(recMessage, fromName);
@@ -155,4 +159,10 @@ int receiveDirectorMessage() {
             return 1;
     }
     
+}
+
+int main() {
+    receiveDirectorMessage();
+    fprintf(stdout, "done");
+    return 0;
 }
