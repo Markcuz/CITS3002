@@ -178,7 +178,7 @@ int checkDirector(int type) {
     sendData(DIRECTORPORT, directorName, message);
     usleep(10000);
   reveiveData(DIRECTORPORT, recMesg);
-	SSL_read(recMesg, decMesg);
+//	SSL_read(recMesg, decMesg);
 	
 	char sucS[] = "success";
 	if(strcmp(decMesg, sucS) == 0){
@@ -204,7 +204,7 @@ int receivingData() {
 	char* gotData;
 	char* message;
 	receiveData(DIRECTORPORT, gotData);
-	SSL_read(gotData, message, strlen(gotData));
+//	SSL_read(gotData, message, strlen(gotData));
 	fseek(listData, list*strlen(message), SEEK_CUR);
 	list++;
 	fwrite(&message, strlen(message), 1, listData);
