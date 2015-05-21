@@ -4,6 +4,8 @@
 #define BANKPORT "4951"
 #define DIRECTORPORT "4950"
 
+#define ADD_ANALYST "add_analyst"
+
 char* myType; // specifies what type fo data it analyses only
 
 int registerService(int type);

@@ -22,10 +22,13 @@ int forwardingToAnalyst(char* recMessage){
     
     fprintf(stdout, "analyst hostname: %s\n", toName);
     
+    //stripping type
+    /*
     char* sendMessage = recMessage+1;
     fprintf(stdout, "message: %s\n", sendMessage);
+    */
     
-    //sendData(DIRECTORPORT, toName, sendMessage);
+    sendData(DIRECTORPORT, toName, recMessage);
     
     return 0;
 }

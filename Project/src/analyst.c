@@ -1,12 +1,13 @@
 #include "analyst.h"
 
 int registerService(int type) {
-    char* sendMessage;
+    char sendMessage[100];
     
-    //create a message to send to register the service
+    char myName[20];
     
-    encrypt_AD(sendMessage);
-    SSL_AD(sendMessage);
+    gethostname(myName, sizeof(myNameIs));
+    
+    sprintf(sendMessage, "%d%s%s", serviceType, ADD_ANALYST, myName);
     
     sendData(DIRECTORPORT, DIRECTOR_NAME, sendMessage);
     
@@ -14,7 +15,7 @@ int registerService(int type) {
 }
 
 int receiveDataToProcess() {
-   /* char* recMessage;
+    char* recMessage;
     
     receiveData(DIRECTORPORT, recMessage);
     //parsing for the data from the director.
@@ -47,7 +48,7 @@ int receiveDataToProcess() {
         SSL_AD(failHopper);
         sendData(DIRECTORPORT, DIRECTOR_NAME, failMessage);
         return 0;
-    }*/
+    }
     return 1;
 }
 
@@ -79,5 +80,8 @@ int depositPayment(char* payment) {
 	else{return 1;}    
 }
 
+int main() {
+    return 0;
+}
 
 
