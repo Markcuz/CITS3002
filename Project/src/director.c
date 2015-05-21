@@ -3,30 +3,38 @@
 //expecting message: <type> <data> <identifier> <collectorHostname>
 int forwardingToAnalyst(char* recMessage){
     
-    /*FILE* table;
+    fprintf(stdout, "incoming message: %s\n", recMessage);
+
+    FILE* table;
     ssize_t read;
     size_t len = 0;
     char* toName;
     
     table = fopen("typeTable", "r+");
     char* line = NULL;
-    while((read = getLine(&line,&len,table)) != -1) {
-        if(line[0]=recMessage[0]) {
+    while((read = getline(&line,&len,table)) != -1) {
+        if(line[0]==recMessage[0]) {
             strtok(line, " \n");
             toName = strtok(NULL, " \n");
             break;
         }
     }
     
-    char* sendMessage;
-    sendMessage = strstr(recMessage, TO_ANALYST);
-    */
-    //sendData(DIRECTORPORT, toName, recMessage++);
+    fprintf(stdout, "analyst hostname: %s\n", toName);
+    
+    char* sendMessage = recMessage+1;
+    fprintf(stdout, "message: %s\n", sendMessage);
+    
+    //sendData(DIRECTORPORT, toName, sendMessage);
+    
     return 0;
 }
 
 //expecting message: <type> <identifier> <Collector_hostname>
 int checkType(char* message){
+    
+    fprintf(stdout, "incoming message: %s\n", message);
+    
     int typeAvail = 0;
     //checks the table to see if can send
     FILE* table;
@@ -35,51 +43,51 @@ int checkType(char* message){
     
     table = fopen("typeTable", "r+");
     char* line = NULL;
-    while((read = getLine(&line,&len,table)) != -1) {
-        if(line[0]=message[0]) {
+    while((read = getline(&line,&len,table)) != -1) {
+        if(line[0]==message[0]) {
+            fprintf(stdout, "line: %s\n", line);
             typeAvail = 1;
             break;
         }
     }
     
-    char* fromName = strstr(message, CHECK_TYPE)+sizeof(CHECK_TYPE);
+    char* fromName = strstr(message, CHECK_TYPE)+sizeof(CHECK_TYPE)-1;
+    fprintf(stdout, "from name: %s\n", fromName);
     
     if(typeAvail) {
-        char retMessage[10];
+        char retMessage[10] = "success";
         //create some message to tell available
-        retMessage = "avail"
+        fprintf(stdout, "success");
         //sendData(DIRECTORPORT, fromName, retMessage);
         return 0;
     }
     else {
-        char retMessage[10];
-        //create some message to tell unavailable
-        retMessage = "notAvail";
+        char retMessage[10] = "failure";
+        fprintf(stdout, "failure");
         //sendData(DIRECTORPORT, fromName, retMessage);
         return 0;
     }
-    
     return 1;
 }
 
 //clears off the dataType character then forwards to the first analyst that cna analyse it
 //expecting message: <data> <identifier> <Collector_hostname>
+//sending: <data>
 int forwardingToCollector(char* recMessage) {
 
+    fprintf(stdout, "incoming message: %s\n", recMessage);
     
+    char *junk;
+    junk = strstr(recMessage, TO_COLLECT);
     
-    /*
-    int count;
-    char* currentMessage = recMessage;
-     currentMessage++;
+    int len = strlen(recMessage)-strlen(junk);
     
-    char* startID = strstr(recMessage, TO_COLLECT);
+    char sendString[len];
     
-    while(currentMessage!=startID) {
-        currentMessage++;
-        count++;
-    }
-    */
+    strncpy(sendString, recMessage, len);
+    
+    fprintf(stdout, "sending message: %s\n", sendString);
+    
     //figure out who to send to via message
     //sendData(DIRECTORPORT, toName, recMessage);
     return 0;
@@ -88,6 +96,9 @@ int forwardingToCollector(char* recMessage) {
 //expecting message: <type> <identifier> <Analyst_hostname>
 //writes <typeChar> " " <AnalystHostname> to "typeTable"
 int addAnalyst(char* message) {
+    
+    fprintf(stdout, "incoming message: %s\n", message);
+    
     //add analyst to the table
     FILE *table = fopen("typeTable", "a");
     
@@ -97,17 +108,23 @@ int addAnalyst(char* message) {
         char initialise[]="Director: \n";
         fwrite(initialise, sizeof(char), sizeof(initialise), table);
     }
+    
+    char type[1];
+    type[0]= message[0];
 
-    fwrite(message[0],sizeof(char), 1, table);
+    fwrite(type,sizeof(char), 1, table);
     
     char* start;
     start = strstr(message, ADD_ANALYST);
     
+    fprintf(stdout, "start hostname: %s\n", start);
+    
     fwrite(" ",sizeof(char),1, table);
     
     char hostname[(strlen(message)+1)-strlen(ADD_ANALYST)];
-    strcpy(hostname,start+strlen(ADD_ANALYST)+1);
-    hostname[-1]='\0';
+    strcpy(hostname,start+strlen(ADD_ANALYST));
+    
+    fprintf(stdout, "hostname: %s\n", hostname);
     
     fwrite(hostname,sizeof(char),sizeof(hostname), table);
     
@@ -129,28 +146,30 @@ int deParseMessage(char* recMessage) {
     if(strstr(recMessage, ADD_ANALYST)!=NULL) {
         return 3;
     }
-    
+    return -1;
 }
 
 int receiveDirectorMessage() {
-    char* recMessage = "cadd_analystmyHostname";
-    fprintf(stdout, "incoming message: %s", recMessage);
+    //char* recMessage = "cadd_analystmyHostname"; testing adding analyst
+    //char* recMessage = "ccheck_typemyHostname"; testing check
+    //char* recMessage = "cto_analysthostname";
+    //char* recMessage = "daat.to_collectorhostname";
     char* fromName;
     
     //receiveData(DIRECTORPORT, recMessage);
     int messageType = deParseMessage(recMessage);
     
-    fprintf(stdout, "type: %d", messageType);
+    fprintf(stdout, "type: %d\n", messageType);
     
     switch(messageType) {
         case 0:
-            forwardingToCollector(recMessage, fromName);
+            forwardingToCollector(recMessage);
             break;
         case 1:
-            checkType(recMessage, fromName);
+            checkType(recMessage);
             break;
         case 2:
-            forwardingToAnalyst(recMessage, fromName);
+            forwardingToAnalyst(recMessage);
             break;
         case 3:
             addAnalyst(recMessage);
@@ -158,11 +177,11 @@ int receiveDirectorMessage() {
         default:
             return 1;
     }
-    
+    return 1;
 }
 
 int main() {
     receiveDirectorMessage();
-    fprintf(stdout, "done");
+    fprintf(stdout, "done\n");
     return 0;
 }

@@ -1,6 +1,5 @@
 #include "analyst.h"
-#include "comms.h"
-int serviceType = 3; //I dunno, set this up sometime.
+
 int registerService(int type) {
     char* sendMessage;
     

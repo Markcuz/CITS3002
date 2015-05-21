@@ -1,4 +1,4 @@
-
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -15,22 +15,19 @@
 #define DIRECTORPORT "4950"
 #define MAXBUFLEN 100
 
-//store some sort of a table linking datatype to analyst
-char* storage[2];
+#define TO_COLLECT "to_collect"
+#define TO_ANALYST "to_analyst"
+#define CHECK_TYPE "check_type"
+#define ADD_ANALYST "add_analyst"
 
-int forwardingToAnalyst(char* message, char* fromName);
+int forwardingToAnalyst(char* message);
 
-int checkType(char* message, char* fromName); //checks for analyst available for data type
+int checkType(char* message); //checks for analyst available for data type
 
-int forwardingToCollector(char* message, char* fromName);
+int forwardingToCollector(char* message);
 
 int addAnalyst(char* message);
 
 int receiveDirectorMessage(void);
 
-int encrypt_DA(char* message);
-int SSL_DA(char* message);
-int encrypt_DC(char* message);
-int SSL_DC(char* message);
-
-int decryptMessageDirector(char* message);
+int deParseMessage(char* message);
