@@ -90,6 +90,7 @@ int givePayment(char* recMessage, char* fromName) {
 		econStart();
 		centBanked = fopen("centdepot","r+");
 	}
+	printf("EEYYYEOO%s\n", recMessage);
 	char ownID[20];
 	strncpy(ownID,recMessage+7, 19);
 	ownID[19] = '\0';
@@ -154,8 +155,8 @@ int givePayment(char* recMessage, char* fromName) {
 	cents[-1] = '\0';
 	fclose(centBanked);
 	fclose(centList);
-    printf("fromName: %s", fromName);
-    
+    printf("fromName: %s\n", fromName);
+    printf("CASH: %s\n", cents);
     //WARNING changed
     usleep(10000);
 	sendData(BANKPORT, "127.0.0.1", sendMessage);
@@ -229,32 +230,37 @@ char *findName(char* recMessage, int cas){
 
 //message: <type> <fromName>
 int receiveBankMessage() {
+	printf("HERE\n");
+	char deMec[100];
+	char datMec[100];
 	char* recMessage; // for received transmission
-	receiveData(BANKPORT, recMessage);
-    	char deMec[100];
-	sprintf(deMec, "%s", recMessage);
 	recMessage = deMec;
+	receiveData(BANKPORT, recMessage);
+    	printf("TWO\n");
+	//sprintf(deMec, "%s\n\n\nTHAT'S ALL FOLKS\n", recMessage);
+	recMessage = deMec;
+	printf("TWO%s\n", deMec);
 	int deposit = deParse(recMessage);
 //the incoming message addressName
 	char* fromName;
 	if(deposit == 0){
 			fromName = findName(recMessage, 36);
-			sprintf(deMec, "%s", fromName);
-			fromName = deMec;
+			sprintf(datMec, "%s", fromName);
+			fromName = datMec;
 			checkDeposit(recMessage, fromName);
 			return 0;
 	}
 	else if(deposit ==1){
 			fromName = findName(recMessage, 26);
-			sprintf(deMec, "%s", fromName);
-			fromName = deMec;
+			sprintf(datMec, "%s", fromName);
+			fromName = datMec;
 			givePayment(recMessage, fromName);
 			return 0;
 	}
 	else if(deposit == 2){
 			fromName = findName(recMessage, 7);
-			sprintf(deMec, "%s", fromName);
-			fromName = deMec;
+			sprintf(datMec, "%s", fromName);
+			fromName = datMec;
 			giveAccount(fromName);
 			return 0;
 	}
@@ -286,3 +292,4 @@ int receiveBankMessage() {
               
               
        
+
