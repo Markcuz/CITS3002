@@ -176,27 +176,54 @@ int checkDirector(int type) {
     sprintf(message, "%d%s%s", type, TO_ANALYST, myName);
   
     sendData(DIRECTORPORT, directorName, message);
-    
-    //check the receive
-    
-    return 0;
+    usleep(10000);
+  reveiveData(DIRECTORPORT, recMesg);
+	SSL_read(recMesg, decMesg);
+	
+	char sucS[] = "success";
+	if(strcmp(decMesg, sucS) == 0){
+		return 0;
+	}
+	else{
+		return 1;
+	}
 }
+
 
 //receiving the processed Data from the director
 int receivingData() {
-
-    char* message = "";
-    
-    //receiving on the director to collector port wait until has received this data
-    receiveData(DIRECTORPORT, message);
-    
-  //  decrypt_DC(message);
-    
-    ///printing for when done?
-    printf("%s",message);
-    
-    return 0;
+	FILE *lstData;
+	int list;
+	lastData = fopen("endUser", "r+");
+	if(lastData == NULL){
+		lastData = ("endUser", "w+");
+		list = 0;
+		fwrite(&list, sizeof(int), 1, listData);
+	}
+	else{fread(&list, sizeof(int), 1, listData);}
+	char* gotData;
+	char* message;
+	receiveData(DIRECTORPORT, gotData);
+	SSL_read(gotData, message, strlen(gotData));
+	fseek(listData, list*strlen(message), SEEK_CUR);
+	list++;
+	fwrite(&message, strlen(message), 1, listData);
+	fseek(listData, 0, SEEK_SET);
+	fwrite(&list, sizeof(int), 1, listData);
+	fclose(listData);
+	return 0;
 }
+
+int showData(){
+	FILE *listData;
+	listData= fopen("endUser", "r");
+	fseek(listData, sizeof(int), SEEK_SET);
+	char buff[100];
+	while(fgets(buff, 100, listData) != NULL){
+		printf("%s\n", nuff);
+	}
+	return 0;
+ }
 
 int main(int argc, char* argv[]) {
     
