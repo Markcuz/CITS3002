@@ -103,9 +103,10 @@ int buy_eCent() {//we can change the void to an int input to spec how many
 int sending(int data, char* message) {
 
     //need to check the director
-    if(checkDirector(data) != 0) {//someone else's problem ~Matt~
-        //wait for a while? until director has an analyst?
-    }
+   	if(checkDirector(data) != 0) {
+		print("out of order\n");
+		return 1;
+	}
     
     //add something to front of string to identify a data exchange
     /* somethign to put together encrypted stirng*/
@@ -142,10 +143,7 @@ int sending(int data, char* message) {
 	
 	gethostname(myname, sizeof(myname));
 	char outerLayer[strlen(message)+strlen(myname)+9];
-	sprintf(outerLayer, "%sfromCol%d%s",myname, data, message);
-/*
-	Here's the ID string: "fromCol"
-*/
+	sprintf(outerLayer, "%d%sto_analyst%s" data, message, myname);
 
 	message = outerLayer;
 	
@@ -167,40 +165,59 @@ int sending(int data, char* message) {
 }
 
 int checkDirector(int type) {
-    //something to send to Director to identify the request
-   // char* message = "check";
-    
-    //adding encryption from Collector to Director (CD)
-//    encrypt_CD(message);
-    
-    //adding SSL from Collector to Director
-//    SSL_CD(message);
-  /*  
-    if(sendData(DIRECTORPORT, DIRECTOR_NAME, message)==0) {
-        //returning success
-        return 0;
-    }
-    else {
-        //returning failure
-        return 1;
-    }
-    */
-    return 0;
+	char myname[50];
+	char* sendMessage;
+	gethostname(myname, sizeof(myname));
+	char trigger[] = "check_type";
+	char msg[strlen(trigger)+strlen(myname)];
+	sprintf(msg, "%d%s%s",type, trigger, myname);
+
+	char* recMesg;
+	char* decMesg;
+	reveiveData(DIRECTORPORT, recMesg);
+	SSL_read(recMesg, decMesg);
+	
+	char sucS[] = "success";
+	if(strcmp(decMesg, sucS) == 0){
+		return 0;
+	}
+	else{
+		return 1;
+	}
 }
 
 //receiving the processed Data from the director
 int receivingData() {
-
-    char* message = "";
-    
-    //receiving on the director to collector port wait until has received this data
-//    receiveData(DIRECTORPORT, message);
-    
-  //  decrypt_DC(message);
-    
-    ///printing for when done?
-    printf("%s",message);
-    
-    return 0;
+	FILE *lstData;
+	int list;
+	lastData = fopen("endUser", "r+");
+	if(lastData == NULL){
+		lastData = ("endUser", "w+");
+		list = 0;
+		fwrite(&list, sizeof(int), 1, listData);
+	}
+	else{fread(&list, sizeof(int), 1, listData);}
+	char* gotData;
+	char* message;
+	receiveData(DIRECTORPORT, gotData);
+	SSL_read(gotData, message, strlen(gotData));
+	fseek(listData, list*strlen(message), SEEK_CUR);
+	list++;
+	fwrite(&message, strlen(message), 1, listData);
+	fseek(listData, 0, SEEK_SET);
+	fwrite(&list, sizeof(int), 1, listData);
+	fclose(listData);
+	return 0;
 }
+
+int showData(){
+	FILE *listData;
+	listData= fopen("endUser", "r");
+	fseek(listData, sizeof(int), SEEK_SET);
+	char buff[100];
+	while(fgets(buff, 100, listData) != NULL){
+		printf("%s\n", nuff);
+	}
+	return 0;
+ }
 
