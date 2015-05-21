@@ -96,7 +96,7 @@ int receiveData(char* port, char* receivedMessage) {
         perror("recvfrom");
         return 1;
     }
-    buf[numbytes] = '\0';
+    receivedMessage[numbytes] = '\0';
     //receivedMessage = strdup(buf);
     
     printf("rec: %s", receivedMessage);

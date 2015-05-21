@@ -25,9 +25,9 @@ int forwardingToAnalyst(char* recMessage){
     
     //stripping type
     
-    char sendMessage[100]= "hell";
+    char* sendMessage = recMessage+1;
     fprintf(stdout, "message: %s\n", sendMessage);
-     sendData(DIRECTORPORT, toName, sendMessage);
+    sendData(DIRECTORPORT, toName, sendMessage);
     
     return 0;
 }
@@ -136,7 +136,10 @@ int addAnalyst(char* message) {
     
     fwrite("\n",sizeof(char),1, table);
     
+    fclose(table);
+    
     return 0;
+
 }
 
 int deParseMessage(char* recMessage) {
@@ -156,8 +159,8 @@ int deParseMessage(char* recMessage) {
 }
 
 int receiveDirectorMessage() {
-    char recMessage[100];// = "3to_analyst127.0.0.1";
-    
+    char recMessage[100];
+    //char* recMessage = "3to_analyst127.0.0.1";
     receiveData(DIRECTORPORT, recMessage);
     
     printf("message: %s", recMessage);
@@ -188,6 +191,8 @@ int main() {
     char hostname[100];
     gethostname(hostname, sizeof(hostname));
     printf("Director Hostname: %s\n",hostname);
+    
+    receiveDirectorMessage();
     
     while(1) {
         receiveDirectorMessage();

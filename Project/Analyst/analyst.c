@@ -16,35 +16,49 @@ int registerService(int type) {
 }
 
 int receiveDataToProcess() {
-    char* recMessage;
+    char* recMessage = malloc(100 * sizeof(char));
     
     printf("receiving data\n");
     receiveData(DIRECTORPORT, recMessage);
     printf("received data\n");
     
+    printf("got message: ");
     //parsing for the data from the director.
-	    	char* collName;
-    	char* colMessage;
+    
+    char* collName = malloc(100 * sizeof(char));
+    char* colMessage = malloc(100 * sizeof(char));
+    
 	char msEnd[] = "Message_END";
+    
 	char* dN = strstr(recMessage, msEnd);
 	char* dirName = dN+(strlen(msEnd));
+    
+    free(recMessage);
 		
 	char coinN[30];
 	strcpy(coinN, colMessage);
     //splitting up the message into eCent and message (after stripping layers)
-    char* payment;//format(ownerBankID, coinID)
-    char* message;//DATA
+    char* payment = malloc(100 * sizeof(char));//format(ownerBankID, coinID)
+    char* message = malloc(100 * sizeof(char));//DATA
+    
+    printf("didnt fail badly");
+    
     
     if(depositPayment(payment)==0) {
         processData(message,collName);
+        free(collName);
+        free(colMessage);
+        free (message);
+        free(payment);
         return 0;
     }
-    
+
     else {
-        char failMessage[20];
+        char failMessage[]="failure";
         sendData(DIRECTORPORT, directorName, failMessage);
         return 0;
     }
+    
     return 1;
 }
 
@@ -63,18 +77,20 @@ int processData(char* message, char* collName) {
 }
 
 int depositPayment(char* payment) {
+    
 	char* dpayment;
     char bMessage[strlen(payment)+7];
+    
 	sprintf(bMessage, "deposit%s",payment);
 	sendData(BANKPORT, bankName, dpayment);
-    char* allGood = "Well done you";
-    char* response;
-    	char* dCode;
+    char allGood[] = "Well done you";
+    char* response = "";
 	receiveData(BANKPORT, response);
-    	if(strcmp(dCode, allGood) == 0){
+    	if(strcmp(response, allGood) == 0){
             return 0;
         }
-	else{return 1;}    
+	else{return 1;}
+    return 1;
 }
 
 int main(int argc, char* argv[]) {

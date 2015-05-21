@@ -149,11 +149,6 @@ int sending(int data, char* message) {
 */
 
 	message = outerLayer;
-	
-//    encrypt_CD(message);
-    
-    //adding SSL from Collector to Director
-//    SSL_CD(message);
     
     //sending the string
     if(sendData(DIRECTORPORT, directorName, message)==0) {
@@ -177,11 +172,13 @@ int checkDirector(int type) {
   
     sendData(DIRECTORPORT, directorName, message);
     usleep(10000);
-  reveiveData(DIRECTORPORT, recMesg);
+    
+    char recMesg[100];
+    receiveData(DIRECTORPORT, recMesg);
 //	SSL_read(recMesg, decMesg);
 	
 	char sucS[] = "success";
-	if(strcmp(decMesg, sucS) == 0){
+	if(strcmp(recMesg, sucS) == 0){
 		return 0;
 	}
 	else{
@@ -227,8 +224,8 @@ int showData(){
 
 int main(int argc, char* argv[]) {
     
-    if(argc!= 6) {
-        printf("usage: %s directorName bankName walletSize typeName message\n", argv[0]);
+    if(argc!= 4) {
+        printf("usage: %s directorName bankName walletSize\n", argv[0]);
         return 1;
     }
     
@@ -247,7 +244,19 @@ int main(int argc, char* argv[]) {
         buy_eCent();
     }
 
-    //sending(argv[4][0], argv[5]);
+    int type;
+    char* message = malloc(100*sizeof(char));
+    
+    while(1) {
+        printf("type:   ");
+        scanf("%d", &type);
+        printf("message:    ");
+        scanf("%s", message);
+        
+        printf("Sending...\n\n");
+        //sending(type, message);
+        continue;
+    }
     
     return 0;
 }

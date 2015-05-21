@@ -51,8 +51,10 @@ int receiveData(char* port, char* receivedMessage) {
     int rv;
     int numbytes;
     struct sockaddr_storage their_addr;
+    char buf[MAXBUFLEN];
     socklen_t addr_len;
     char s[INET6_ADDRSTRLEN];
+    receivedMessage = malloc(100 * sizeof(char));
     
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC; // set to AF_INET to force IPv4
@@ -90,16 +92,16 @@ int receiveData(char* port, char* receivedMessage) {
     printf("listener: waiting to recvfrom...\n");
     
     addr_len = sizeof their_addr;
-    if ((numbytes = recvfrom(sockfd, receivedMessage, MAXBUFLEN-1 , 0,
+    if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,
                              (struct sockaddr *)&their_addr, &addr_len)) == -1) {
         perror("recvfrom");
         return 1;
     }
+    buf[numbytes] = '\0';
+    receivedMessage = &buf[0];
     
     printf("listener: packet is %d bytes long\n", numbytes);
-    receivedMessage[numbytes] = '\0';
     printf("listener: packet contains \"%s\"\n", receivedMessage);
-    
     
     close(sockfd);
     
