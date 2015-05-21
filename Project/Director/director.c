@@ -28,9 +28,6 @@ int forwardingToAnalyst(char* recMessage){
     fprintf(stdout, "message: %s\n", sendMessage);
      sendData(DIRECTORPORT, toName, recMessage);
     
-    
-    //sendData(DIRECTORPORT, toName, recMessage);
-    
     return 0;
 }
 
@@ -92,7 +89,9 @@ int forwardingToCollector(char* recMessage) {
     
     fprintf(stdout, "sending message: %s\n", sendString);
     
-    char* toName = junk+strlen(TO_COLLECT);
+    char* toName = junk+strlen(TO_COLLECT)+2;
+    
+    printf("sendingTo: %s", toName);
     
     //figure out who to send to via message
     sendData(DIRECTORPORT, toName, recMessage);
@@ -132,7 +131,7 @@ int addAnalyst(char* message) {
     
     fprintf(stdout, "hostname: %s\n", hostname);
     
-    fwrite(hostname,sizeof(char),sizeof(hostname), table);
+    fwrite(hostname,sizeof(char),sizeof(hostname)-1, table);
     
     fwrite("\n",sizeof(char),1, table);
     
@@ -156,9 +155,11 @@ int deParseMessage(char* recMessage) {
 }
 
 int receiveDirectorMessage() {
-    char* recMessage;
+    char recMessage[100];
     
     receiveData(DIRECTORPORT, recMessage);
+    
+    printf("message: %s", recMessage);
     int messageType = deParseMessage(recMessage);
     
     fprintf(stdout, "type: %d\n", messageType);
@@ -186,9 +187,12 @@ int main() {
     char hostname[100];
     gethostname(hostname, sizeof(hostname));
     printf("Director Hostname: %s\n",hostname);
+    
     while(1) {
         receiveDirectorMessage();
-        printf("Director Hostname: %s\n",hostname);
+        printf("Completed Action\n");
+        printf("Director Hostname: %s\n\n",hostname);
     }
+    
     return 0;
 }
