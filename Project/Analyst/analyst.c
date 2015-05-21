@@ -39,10 +39,10 @@ int receiveDataToProcess() {
 	strcpy(coinN, colMessage);
     //splitting up the message into eCent and message (after stripping layers)
     char* payment = malloc(100 * sizeof(char));//format(ownerBankID, coinID)
+    
+    //NEED TO split into payment by no. bytes
+    
     char* message = malloc(100 * sizeof(char));//DATA
-    
-    printf("didnt fail badly");
-    
     
     if(depositPayment(payment)==0) {
         processData(message,collName);
@@ -96,7 +96,8 @@ int depositPayment(char* payment) {
 int main(int argc, char* argv[]) {
     
     if(argc!=4) {
-        printf("usage: bankName directorName dataType");
+        printf("usage: bankName directorName dataType\n");
+        return 1;
     }
     
     bankName = argv[1];

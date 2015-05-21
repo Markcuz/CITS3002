@@ -258,6 +258,7 @@ int main(int argc, char* argv[]) {
         continue;
     }
     
+    free(message);
     return 0;
 }
 
