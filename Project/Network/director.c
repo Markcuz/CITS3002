@@ -106,13 +106,12 @@ int addAnalyst(char* message) {
         table = fopen("typeTable", "w+");
         //add in maybe a number for the director no.
         char initialise[]="Director: \n";
-        fwrite(initialise, sizeof(char), sizeof(initialise), table);
+        fwrite(&initialise, sizeof(initialise), 1, table);
     }
     
-    char type[1];
-    type[0]= message[0];
-
-    fwrite(type,sizeof(char), 1, table);
+    char type;
+    type= message[0];
+    fwrite(&type, 1, 1, table);
     
     char* start;
     start = strstr(message, ADD_ANALYST);
@@ -126,7 +125,7 @@ int addAnalyst(char* message) {
     
     fprintf(stdout, "hostname: %s\n", hostname);
     
-    fwrite(hostname,sizeof(char),sizeof(hostname), table);
+    fwrite(hostname,sizeof(hostname),1, table);
     
     fwrite("\n",sizeof(char),1, table);
     
