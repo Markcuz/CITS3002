@@ -1,23 +1,36 @@
-#include"bank.h"
+#include "bank.h"
 
 char banksID[20] = "0000000000000000000";
 
 void econStart(){
+
 	FILE *centBanked = fopen("centdepot", "w+");
 	FILE *centList = fopen("centBank", "w+");
 	FILE *lastAcc = fopen("bankAcc", "w+");
+    
 	int banknum =0;
 	fwrite(&banknum, sizeof(int), 1, lastAcc);
 	int a = 10000;
 	fwrite(&a, sizeof(int),1, centBanked);
-	for(int i =0; i < a; i++){ //subject to change or alteration if I get a good idea
+    
+    
+	for(int i = 0; i < a; i++){ //subject to change or alteration if I get a good idea
 		eCent cent;
 		cent.identifier = i;
 		strcpy(cent.owner, banksID); //reserved bank ID
-	
+        
 		fwrite(&cent, sizeof(eCent), 1, centBanked);
-		fwrite(&cent, sizeof(eCent),1, centList);
-			}
+    }
+    
+    //only did two for loops due to seg fault on MACOSX
+    for(int i = 0; i < a; i++){
+        eCent cent2;
+        cent2.identifier = i;
+        strcpy(cent2.owner, banksID); //reserved bank ID
+    
+        fwrite(&cent2, sizeof(eCent), 1, centList);
+    }
+    
 	fclose(centBanked);
 	fclose(centList);
 	fclose(lastAcc);
@@ -65,14 +78,11 @@ int checkDeposit(char* recMessage, char* fromName){
 		sendMessage = decline;
 	}
 	char* ssld;
-	SSL_write(ssld, sendMessage, strlen(sendMessage));
+	//SSL_write(ssld, sendMessage, strlen(sendMessage));
 	sendData(BANKPORT, fromName, ssld);
 	printf("%s\n", sendMessage);
 	return 0;
 }
-
-
-
 
 int givePayment(char* recMessage, char* fromName) {
 	FILE *centBanked = fopen("centdepot", "r+");
@@ -97,7 +107,7 @@ int givePayment(char* recMessage, char* fromName) {
 	else{
 		char* badID = "Bad ID";
 		char* ssld;
-		SSL_write(ssld, badID, strlen(badID));
+		//SSL_write(ssld, badID, strlen(badID));
 		sendData(BANKPORT, fromName, ssld);
 		printf("%s\n",badID);
 		return 0;
@@ -107,7 +117,7 @@ int givePayment(char* recMessage, char* fromName) {
 		fclose(centBanked);
 		char noDosh[] = "No soup for you!";
 		char* failstring; //gotta code something here;
-		SSL_write(failstring, &noDosh, strlen(noDosh));
+		//SSL_write(failstring, &noDosh, strlen(noDosh));
 		sendData(BANKPORT, fromName, failstring);
 		//alt = issue new(similar to econ start, but issues a new 10000 ecents
 		return 0;
@@ -144,14 +154,17 @@ int givePayment(char* recMessage, char* fromName) {
 	cents[-1] = '\0';
 	fclose(centBanked);
 	fclose(centList);
-	SSL_write(sendMessage, &cents, strlen(cents));
+	//SSL_write(sendMessage, &cents, strlen(cents));
 	sendData(BANKPORT, fromName, sendMessage);
 	return 0;
 }
 
 int giveAccount(char* fromName){
-	printf("%s\n", fromName);
+    fprintf(stdout, "hello..%s..", fromName);
 	FILE *lastAcc = fopen("bankAcc", "r+");
+    
+    printf("..%s..", fromName);
+    /*
 	if(lastAcc == NULL){
 		econStart();
 		lastAcc = fopen("bankAcc", "r+");
@@ -168,9 +181,16 @@ int giveAccount(char* fromName){
 	fseek(lastAcc,0, SEEK_SET);
 	fread(&nID,sizeof(int), 1, lastAcc);
 	printf("lastacc%d\n", nID);
-	char* sendMessage;
-	SSL_write(sendMessage, &acnum, strlen(acnum);
-	sendData(BANKPORT,fromName, sendMessage);
+    
+     */
+    //do we need to create the send message?
+	char* sendMessage = "hello";
+	//SSL_write(sendMessage, &acnum, strlen(acnum);
+    
+    printf("..%s..", fromName);
+    
+    //sending is being a pain
+	sendData(BANKPORT,"127.0.0.1", sendMessage);
 	return 0;
 }
 int deParse(char* mesg){
@@ -180,28 +200,50 @@ int deParse(char* mesg){
 	char an[] = "deposit";
 	char col[] ="collect";
 	char acc[] ="initial";
-	if(strcmp(parse, an) == 0){ return 0;}
-	else if(strcmp(parse, col)== 0){ return 1;}
-	else if(strcmp(parse, acc)==0){return 2;}
-	else{return 3;}
+
+	if(strcmp(parse, an) == 0){
+        return 0;
+    }
+	else if(strcmp(parse, col)== 0){
+        return 1;
+    }
+	else if(strcmp(parse, acc)==0){
+        return 2;
+    }
+	else{
+        printf("not found");
+        return 3;
+    }
 }
-char *findName(char* recMessage, int cas){ //I'll fix this up soon, just want to poke about with some ideas first
-	char* name;
-	
+char *findName(char* recMessage, int cas){
+    printf("received: %s\n", recMessage);
+    char* name;
+	/*
 	int lngth = strlen(recMessage)+1;
 	char serName[lngth - cas];
-	strcpy(serName,recMessage +cas);
-	serName[-1] = '\0';
+    
+	strncpy(serName,recMessage +cas);
+	//serName[-1] = '\0';
 	name = serName;
-	return name;
+	return name;*/
+    
+    char serName[100];
+    
+    strcpy(serName,recMessage+cas);
+    
+    name = &serName[0];
+    
+    printf("name: %s \n", name);
+    return name;
 	
 }
+
+//message: <type> <fromName>
 int receiveBankMessage() {
-	char* rect; // for received transmission
-	receiveData(BANKPORT, rect);
-//transaction type
-	char* recMessage;
-	SSL_read(rect, recMessage, strlen(rect));
+	char* recMessage; // for received transmission
+	receiveData(BANKPORT, recMessage);
+    
+
 	int deposit = deParse(recMessage);
 //the incoming message addressName
 	char* fromName;
@@ -222,26 +264,31 @@ int receiveBankMessage() {
 			givePayment(recMessage, fromName);
 			return 0;
 	}
-	else if(deposit ==2){
+	else if(deposit == 2){
 			fromName = findName(recMessage, 7);
-			char f2[strlen(fromName)];
-			strcpy(f2, fromName);
-			fromName = f2;
+            printf("fromName: %s\n", fromName);
 			giveAccount(fromName);
 			return 0;
 	}
-	else{
-		
+	else {
 		return 1;
     }
-	
 	return 0;
 }
               
               int main() {
-                  while(1) {
-                      receiveBankMessage();
+                  
+                  char hostname[100];
+                  gethostname(hostname, sizeof(hostname));
+                  printf("Bank Hostname: %s\n",hostname);
+                  
+                  econStart();
+                  //while(1) {
+                  if(receiveBankMessage()!=0) {
+                      return 1;
                   }
+                      //printf("Bank Hostname: %s\n",hostname);
+                  //}
                   return 0;
               }
               

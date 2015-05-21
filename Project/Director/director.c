@@ -23,11 +23,11 @@ int forwardingToAnalyst(char* recMessage){
     fprintf(stdout, "analyst hostname: %s\n", toName);
     
     //stripping type
-    /*
+    
     char* sendMessage = recMessage+1;
     fprintf(stdout, "message: %s\n", sendMessage);
      sendData(DIRECTORPORT, toName, recMessage);
-    */
+    
     
     //sendData(DIRECTORPORT, toName, recMessage);
     
@@ -62,13 +62,13 @@ int checkType(char* message){
         char retMessage[10] = "success";
         //create some message to tell available
         fprintf(stdout, "success");
-        //sendData(DIRECTORPORT, fromName, retMessage);
+        sendData(DIRECTORPORT, fromName, retMessage);
         return 0;
     }
     else {
         char retMessage[10] = "failure";
         fprintf(stdout, "failure");
-        //sendData(DIRECTORPORT, fromName, retMessage);
+        sendData(DIRECTORPORT, fromName, retMessage);
         return 0;
     }
     return 1;
@@ -92,8 +92,10 @@ int forwardingToCollector(char* recMessage) {
     
     fprintf(stdout, "sending message: %s\n", sendString);
     
+    char* toName = junk+strlen(TO_COLLECT);
+    
     //figure out who to send to via message
-    //sendData(DIRECTORPORT, toName, recMessage);
+    sendData(DIRECTORPORT, toName, recMessage);
     return 0;
 }
 
@@ -154,13 +156,9 @@ int deParseMessage(char* recMessage) {
 }
 
 int receiveDirectorMessage() {
-    //char* recMessage = "cadd_analystmyHostname"; testing adding analyst
-    //char* recMessage = "ccheck_typemyHostname"; testing check
-    //char* recMessage = "cto_analysthostname";
-    //char* recMessage = "daat.to_collectorhostname";
-    char* fromName;
+    char* recMessage;
     
-    //receiveData(DIRECTORPORT, recMessage);
+    receiveData(DIRECTORPORT, recMessage);
     int messageType = deParseMessage(recMessage);
     
     fprintf(stdout, "type: %d\n", messageType);
@@ -185,8 +183,12 @@ int receiveDirectorMessage() {
 }
 
 int main() {
+    char hostname[100];
+    gethostname(hostname, sizeof(hostname));
+    printf("Director Hostname: %s\n",hostname);
     while(1) {
         receiveDirectorMessage();
+        printf("Director Hostname: %s\n",hostname);
     }
     return 0;
 }
