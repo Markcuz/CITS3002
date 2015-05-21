@@ -51,7 +51,6 @@ int receiveData(char* port, char* receivedMessage) {
     int rv;
     int numbytes;
     struct sockaddr_storage their_addr;
-    char buf[MAXBUFLEN];
     socklen_t addr_len;
     char s[INET6_ADDRSTRLEN];
     
@@ -69,24 +68,26 @@ int receiveData(char* port, char* receivedMessage) {
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                              p->ai_protocol)) == -1) {
-            perror("socket");
+            perror("listener: socket");
             continue;
         }
         
         if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
             close(sockfd);
-            perror("bind");
+            perror("listener: bind");
             continue;
         }
         break;
     }
     
     if (p == NULL) {
-        fprintf(stderr, "failed to bind socket\n");
+        fprintf(stderr, "listener: failed to bind socket\n");
         return 2;
     }
     
     freeaddrinfo(servinfo);
+    
+    printf("listener: waiting to recvfrom...\n");
     
     addr_len = sizeof their_addr;
     if ((numbytes = recvfrom(sockfd, receivedMessage, MAXBUFLEN-1 , 0,
@@ -96,10 +97,9 @@ int receiveData(char* port, char* receivedMessage) {
     }
     
     printf("listener: packet is %d bytes long\n", numbytes);
-    receivedMessage[numbytes]='\0';
+    receivedMessage[numbytes] = '\0';
     printf("listener: packet contains \"%s\"\n", receivedMessage);
     
-    //receivedMessage = &buf[0];
     
     close(sockfd);
     

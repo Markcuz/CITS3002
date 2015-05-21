@@ -154,8 +154,10 @@ int givePayment(char* recMessage, char* fromName) {
 	cents[-1] = '\0';
 	fclose(centBanked);
 	fclose(centList);
-	//SSL_write(sendMessage, &cents, strlen(cents));
-	sendData(BANKPORT, fromName, sendMessage);
+    printf("fromName: %s", fromName);
+    
+    //WARNING changed
+	//sendData(BANKPORT, "127.0.0.1", sendMessage);
 	return 0;
 }
 
@@ -179,8 +181,13 @@ int giveAccount(char* fromName){
 	fread(&nID,sizeof(int), 1, lastAcc);
 	printf("lastacc%d\n", nID);
     
+    printf("fromName: ..%s..", fromName);
     //sending is being a pain
-	sendData(BANKPORT, fromName, acnum);
+    usleep(10000);
+    
+    //WARNING need to change to fromName
+	sendData(BANKPORT, "127.0.0.1", acnum);
+    printf("sent");
 	return 0;
 }
 int deParse(char* mesg){
@@ -272,7 +279,7 @@ int receiveBankMessage() {
                           printf("bad bank message");
                           return 1;
                       }
-                      printf("Completed Transaction! \n");
+                      printf("Completed Transaction! \n\n");
                       printf("Bank Hostname: %s\n",hostname);
                   }
                   return 0;

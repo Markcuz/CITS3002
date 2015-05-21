@@ -10,10 +10,9 @@ int getBankNumber(){
 	strcat(nameIs, myNameIs);
 	char* marshalMathers = nameIs; //yeah, lunch was on my mind
 
-// hard to keep "humour" out when hungry.
-//	encrypt_CB(marshalMathers);
-//	SSL_CB(marshalMathers);
+    printf("sending number!\n");
 	sendData(BANKPORT, bankName, marshalMathers);
+    printf("sent number\n");
 	
 	char newNum[20];
 	sprintf(newNum, "%s", message);
@@ -22,8 +21,10 @@ int getBankNumber(){
 	sprintf(numCoin, "%010d\n", 0);
 	message = newNum;
 	wallet = fopen("byteCoin", "w+");
-
+    
+    printf("receiving number\n");
 	receiveData(BANKPORT, message);
+    printf("got number!");
 	
 	fwrite(message, 19, 1, wallet);
 	fwrite(&numCoin, 12, 1, wallet);
@@ -64,9 +65,8 @@ int receiveeCent(){
 	return 0;
 }
 
-int buy_eCent() {//we can change the void to an int input to spec how many
-		     // ecents to buy.
-	char* message ;
+int buy_eCent() {
+    char* message ;
 	FILE *wallet; 
 	/**
 	wallet config:
@@ -82,15 +82,17 @@ int buy_eCent() {//we can change the void to an int input to spec how many
 		wallet = fopen("byteCoin", "r+");
 	}
 	
+    char myNameIs[50];
+    gethostname(myNameIs, sizeof(myNameIs));
+    
 	char bID[20];
 	fgets(bID, 20, wallet);
 	sprintf(bID, "%019d", 1);
 	message = bID;
 	sprintf(type, "collect%s", message);
-	message = type;
-//	encrypt_CB(message);
-//	SSL_CB(message);
+    sprintf(message, "%s%s", type, myNameIs);
 	sendData(BANKPORT, bankName, message);
+    usleep(10000);
 	fclose(wallet);
 	receiveeCent();	
 	
@@ -177,8 +179,6 @@ int checkDirector(int type) {
     
     //check the receive
     
-   
-    
     return 0;
 }
 
@@ -188,7 +188,7 @@ int receivingData() {
     char* message = "";
     
     //receiving on the director to collector port wait until has received this data
-//    receiveData(DIRECTORPORT, message);
+    receiveData(DIRECTORPORT, message);
     
   //  decrypt_DC(message);
     
@@ -210,10 +210,14 @@ int main(int argc, char* argv[]) {
     
     int stash;
     
+    printf("getting bank no.\n");
     getBankNumber();
+    printf("got bank no.\n\n");
     
     for (stash = 0; stash<atoi(argv[3]); stash++) {
-        //buy_eCent();
+        printf("buying eCent %d\n", stash);
+        usleep(10000);
+        buy_eCent();
     }
 
     //sending(argv[4][0], argv[5]);
