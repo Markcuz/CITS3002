@@ -14,6 +14,7 @@ int forwardingToAnalyst(char* recMessage){
     char* line = NULL;
     while((read = getline(&line,&len,table)) != -1) {
         if(line[0]==recMessage[0]) {
+            printf("found!");
             strtok(line, " \n");
             toName = strtok(NULL, " \n");
             break;
@@ -24,9 +25,9 @@ int forwardingToAnalyst(char* recMessage){
     
     //stripping type
     
-    char* sendMessage = recMessage+1;
+    char sendMessage[100]= "hell";
     fprintf(stdout, "message: %s\n", sendMessage);
-     sendData(DIRECTORPORT, toName, recMessage);
+     sendData(DIRECTORPORT, toName, sendMessage);
     
     return 0;
 }
@@ -116,7 +117,7 @@ int addAnalyst(char* message) {
     
     char type[1];
     type[0]= message[0];
-
+    
     fwrite(type,sizeof(char), 1, table);
     
     char* start;
@@ -131,7 +132,7 @@ int addAnalyst(char* message) {
     
     fprintf(stdout, "hostname: %s\n", hostname);
     
-    fwrite(hostname,sizeof(char),sizeof(hostname)-1, table);
+    fwrite(hostname,sizeof(char),sizeof(hostname), table);
     
     fwrite("\n",sizeof(char),1, table);
     
@@ -155,7 +156,7 @@ int deParseMessage(char* recMessage) {
 }
 
 int receiveDirectorMessage() {
-    char recMessage[100];
+    char recMessage[100];// = "3to_analyst127.0.0.1";
     
     receiveData(DIRECTORPORT, recMessage);
     

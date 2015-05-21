@@ -41,7 +41,7 @@ int receiveDataToProcess() {
     }
     
     else {
-        char* failMessage;
+        char failMessage[20];
         sendData(DIRECTORPORT, directorName, failMessage);
         return 0;
     }
