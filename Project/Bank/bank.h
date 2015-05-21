@@ -20,7 +20,7 @@
 
 typedef struct {
     int identifier;
-    char* owner;
+    char owner[20];
 } eCent;
 
 int checkDeposit(); // checking eCent from Analyst
