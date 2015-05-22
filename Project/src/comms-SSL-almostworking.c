@@ -202,17 +202,17 @@ void sslWrite (connection *c, char *text)
 }
 
 // Very basic main: we send GET / and print the response.
-int sendData(char* hostname, char *port)
+int sendData(char* hostname, char *port, char* message)
 {
   connection *c;
   char *response;
 
   c = sslConnect (hostname, port);
 
-  sslWrite (c, "GET /\r\n\r\n");
-  response = sslRead (c);
+  sslWrite (c, message);
+//  response = sslRead (c);
 
-  printf ("%s\n", response);
+//  printf ("%s\n", response);
 
   sslDisconnect (c);
   free (response);
@@ -226,7 +226,7 @@ int receiveData(char* port, char *receivedMessage)
   char *response;
 
   c = sslAccept(port);
-
+  
   receivedMessage = sslRead(c);
 
   printf("received: %s\n", receivedMessage);
@@ -238,10 +238,10 @@ int receiveData(char* port, char *receivedMessage)
 }
 
 
-int main() { //tested it out by running it with SSL-server.c 
+int main() {
 	char* rec;
-	sendData("127.0.0.1", "4445");
-	receiveData("4445", rec);
+	sendData("127.0.0.1", "4444", "hello");
+	receiveData("4444", rec);
 	printf("Message is :%s\n", rec);
 	return 0;
 }
