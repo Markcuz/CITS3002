@@ -21,13 +21,8 @@
 #define ADD_ANALYST "add_analyst"
 
 int forwardingToAnalyst(char* message);
-
-int checkType(char* message); //checks for analyst available for data type
-
+int checkType(char* message); 
 int forwardingToCollector(char* message);
-
 int addAnalyst(char* message);
-
 int receiveDirectorMessage(void);
-
 int deParseMessage(char* message);
