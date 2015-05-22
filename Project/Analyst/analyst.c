@@ -29,7 +29,7 @@ int receiveDataToProcess() {
     char* colMessage = malloc(100 * sizeof(char));
     
 	char* dN = strstr(recMessage, TO_ANALYST);
-	char* dirName = dN+(strlen(msEnd));
+	char* dirName = dN+(strlen(TO_ANALYST));
     
     free(recMessage);
 		
