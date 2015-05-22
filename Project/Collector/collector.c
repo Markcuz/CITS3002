@@ -1,18 +1,24 @@
 
 #include "collector.h"
 
+/**
+ * gets the bank number (initialises account)
+ * send Message: [initial] <myHostname>
+ * receive Message: 
+ * writes message to text file "byteCoin"
+ */
 int getBankNumber(){
 	FILE *wallet;
 	char* message = "";
+ 
 	char myNameIs[50];
 	gethostname(myNameIs, sizeof(myNameIs));
 	char nameIs[57] = "initial";
 	strcat(nameIs, myNameIs);
-	char* marshalMathers = nameIs; //yeah, lunch was on my mind
+	char* marshalMathers = nameIs;
 
-    printf("sending number!\n");
+    printf("Requesting bank number/n");
 	sendData(BANKPORT, bankName, marshalMathers);
-    printf("sent number\n");
 	
 	char newNum[20];
 	sprintf(newNum, "%s", message);
@@ -22,9 +28,9 @@ int getBankNumber(){
 	message = newNum;
 	wallet = fopen("byteCoin", "w+");
     
-    printf("receiving number\n");
+    printf("Receiving bank number\n");
 	receiveData(BANKPORT, message);
-    printf("got number!");
+    printf("Got number!");
 	
 	fwrite(message, 19, 1, wallet);
 	fwrite(&numCoin, 12, 1, wallet);
@@ -33,53 +39,61 @@ int getBankNumber(){
 	return 0;
 }
 
-
+/**
+ * receives and eCent from the bank
+ * rec Message :
+ * stores eCent inside "byteCoin" for later use
+ */
 int receiveeCent(){
 	char coin[999];
  	char* message;
 	message= coin;
+ 
+ 
 	receiveData(BANKPORT, message);
+    printf("Received eCent: %s\n", message);
+ 
 	FILE *wallet;
 	wallet = fopen("byteCoin", "r+");
+ 
 	if(wallet == NULL){
 		return 1;
 	}
-	printf("%s\n", message);
-	printf("HERE\n");
+
 	fseek(wallet, 29, SEEK_SET);
-	printf("HERE\n");
 //	decrypt_BC(message);
 	char* noDosh = "NO SOUP FOR YOU!";
 	char* badID = "Bad ID";
+ 
 	if(strcmp(message, noDosh) == 0){//or something
 	// wait a bit and try again
 		return 2;
 	}
+ 
 	else if(strcmp(message, badID) == 0){
 		// indicating badID
 		//Try again.
 		return 3;
 	}
-	printf("HERE\n");
-	printf("DDODLEY\n\n%s\n", coin);
+ 
 	fwrite(&coin, sizeof(coin), 1, wallet);
 	fseek(wallet, 19, SEEK_SET);
 	sprintf(coin, "%010d\n", 10);
 	fwrite(&coin, 11, 1, wallet);
 	fclose(wallet);
+ 
 	return 0;
 }
 
+/**
+ * requests an eCent from the bank
+ * sendMessage: <accNumber> <hostname>
+ * receives the eCent
+ */
 int buy_eCent() {
     char* message ;
 	FILE *wallet; 
-	/**
-	wallet config:
-	Bank Account Number: 19 chars + '\0'
-	Number of eCoins stored: 10 chars + '\0'
-	eCoin numbers: 10 chars + '\n'
-	end byte: '\0'
-	*/
+
 	wallet = fopen("byteCoin", "r+");//opening hard storage of eCent numbers
 	char type[27];
 	if(wallet == NULL){
@@ -95,22 +109,24 @@ int buy_eCent() {
 	sprintf(bID, "%019d", 1);
 	message = bID;
 	sprintf(type, "collect%s", message);
-	printf("THISISTHEBITYOUWANTED%s\n", type);
     sprintf(message, "%s%s", type, myNameIs);
 	sendData(BANKPORT, bankName, message);
 	receiveeCent();	
 	//usleep(10000);
 	fclose(wallet);
 
-	
-        return 0;
+    return 0;
 }
 
+/**
+ * sends the actual data requiring analysis
+ * send Message: <dataType> <payment> <data> [to_analyst] <myHostname>
+ */
 int sending(int data, char* message) {
 
     //need to check the director
-    if(checkDirector(data) != 0) {//someone else's problem ~Matt~
-        printf("not valid type");
+    if(checkDirector(data) != 0) {
+        printf("Not valid type");
         return 1;
         //wait for a while? until director has an analyst?
     }
@@ -144,16 +160,14 @@ int sending(int data, char* message) {
 	sprintf(witCoin+30,"%s", message);
 	witCoin[-1] ='\0';
 	message = witCoin;
+    
 //	encrypt_CA(message);
 //	SSL_CA(message);
+    
 	char myname[50];
-	
 	gethostname(myname, sizeof(myname));
 	char outerLayer[strlen(message)+strlen(myname)+9];
-	sprintf(outerLayer, "%sfromCol%d%s",myname, data, message);
-/*
-	Here's the ID string: "fromCol"
-*/
+	sprintf(outerLayer, "%sto_analyst%d%s",data, message, myname);
 
 	message = outerLayer;
 	
@@ -162,29 +176,34 @@ int sending(int data, char* message) {
     //adding SSL from Collector to Director
 //    SSL_CD(message);
     
-    //sending the string
     if(sendData(DIRECTORPORT, directorName, message)==0) {
-        //returning success
+        printf("Sent data");
         return 0;
     }
     else {
-        //returning failure
+        printf("failed to send");
         return 1;
     }
     return 0;
 }
 
+/**
+ * asks the director if he can forward the dataType to any known analyst
+ * send Message: <type> [check_type] <myHostname>
+ * rec Message: "success" or "failure"
+ * returns 0 on success, 1 on failure
+ */
 int checkDirector(int type) {
     //something to send to Director to identify the request
     char myName[50];
     gethostname(myName, sizeof(myName));
     char* message;
     sprintf(message, "%d%s%s", type, TO_ANALYST, myName);
-  printf("%s\n", message);
+    printf("Sending message: %s\n", message);
     sendData(DIRECTORPORT, directorName, message);
     usleep(10000);
+    
 	char* recMesg;
-//	char* decMesg;
   receiveData(DIRECTORPORT, recMesg);
 //	SSL_read(recMesg, decMesg);
 	
@@ -197,7 +216,11 @@ int checkDirector(int type) {
 	}
 }
 
-//receiving the processed Data from the director
+/**
+ * receives the processed Data from the director
+ * rec Message: <data>
+ * prints data to file "endUser"
+ */
 int receivingData() {
 	FILE *listData;
 	int list;
@@ -207,7 +230,10 @@ int receivingData() {
 		list = 0;
 		fwrite(&list, sizeof(int), 1, listData);
 	}
-	else{fread(&list, sizeof(int), 1, listData);}
+    
+	else{
+        fread(&list, sizeof(int), 1, listData);
+    }
 	char* gotData;
 	char* message;
 	receiveData(DIRECTORPORT, gotData);
@@ -221,6 +247,9 @@ int receivingData() {
 	return 0;
 }
 
+/**
+ * prints the data in the endUser file
+ */
 int showData(){
 	FILE *listData;
 	FILE *wallet =fopen("byteCoin", "r");
@@ -238,11 +267,16 @@ int showData(){
 	return 0;
  }
 
-
+/**
+ * the main function
+ * initialises the hostnames of bank and director
+ * specifies how many eCents to buy 
+ * then prompts user for sending messages
+ */
 int main(int argc, char* argv[]) {
     
-    if(argc!= 6) {
-        printf("usage: %s directorName bankName walletSize typeName message\n", argv[0]);
+    if(argc!= 4) {
+        printf("usage: %s directorName bankName walletSize\n", argv[0]);
         return 1;
     }
     
@@ -253,15 +287,28 @@ int main(int argc, char* argv[]) {
     getBankNumber();
     printf("got bank no.\n\n");
     
-    printf("buying eCent %d\n", 1);
+    int i;
+    for(i=0; i<argv[3]; i++) {
+        printf("buying eCent package no. %d\n", 1);
         usleep(10000);
         buy_eCent();
+    }
     
-
-    //sending(argv[4][0], argv[5]);
+    int type;
+    char* message = malloc(100*sizeof(char));
     
-//	checkDirector(1);
-showData();
+    while(1) {
+        printf("type:   ");
+        scanf("%d", &type);
+        printf("message:    ");
+        scanf("%s", message);
+        
+        printf("Sending...\n\n");
+        sending(type, message);
+        continue;
+    }
+ 
+    showData();
     return 0;
 }
 
