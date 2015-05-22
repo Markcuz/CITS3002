@@ -35,14 +35,19 @@ int getBankNumber(){
 
 
 int receiveeCent(){
- 	char* message = "";
+	char coin[999];
+ 	char* message;
+	message= coin;
 	receiveData(BANKPORT, message);
 	FILE *wallet;
 	wallet = fopen("byteCoin", "r+");
 	if(wallet == NULL){
 		return 1;
 	}
-	fseek(wallet, 30, SEEK_SET);
+	printf("%s\n", message);
+	printf("HERE\n");
+	fseek(wallet, 29, SEEK_SET);
+	printf("HERE\n");
 //	decrypt_BC(message);
 	char* noDosh = "NO SOUP FOR YOU!";
 	char* badID = "Bad ID";
@@ -55,8 +60,8 @@ int receiveeCent(){
 		//Try again.
 		return 3;
 	}
-	char coin[strlen(message)];
-	sprintf(coin, "%s", message);
+	printf("HERE\n");
+	printf("DDODLEY\n\n%s\n", coin);
 	fwrite(&coin, sizeof(coin), 1, wallet);
 	fseek(wallet, 19, SEEK_SET);
 	sprintf(coin, "%010d\n", 10);
@@ -90,18 +95,19 @@ int buy_eCent() {
 	sprintf(bID, "%019d", 1);
 	message = bID;
 	sprintf(type, "collect%s", message);
+	printf("THISISTHEBITYOUWANTED%s\n", type);
     sprintf(message, "%s%s", type, myNameIs);
 	sendData(BANKPORT, bankName, message);
-    usleep(10000);
-	fclose(wallet);
 	receiveeCent();	
+	//usleep(10000);
+	fclose(wallet);
+
 	
         return 0;
 }
 
 int sending(int data, char* message) {
 
-    printf("data : %d , message: %s\n", data, message);
     //need to check the director
     if(checkDirector(data) != 0) {//someone else's problem ~Matt~
         printf("not valid type");
@@ -110,7 +116,7 @@ int sending(int data, char* message) {
     }
     
     //add something to front of string to identify a data exchange
-    // somethign to put together encrypted stirng
+    /* somethign to put together encrypted stirng*/
     //adding encryption from Collector to Director (CD)
 	char myID[20];
 	char witCoin[strlen(message) + 30];
@@ -138,14 +144,23 @@ int sending(int data, char* message) {
 	sprintf(witCoin+30,"%s", message);
 	witCoin[-1] ='\0';
 	message = witCoin;
+//	encrypt_CA(message);
+//	SSL_CA(message);
 	char myname[50];
 	
 	gethostname(myname, sizeof(myname));
 	char outerLayer[strlen(message)+strlen(myname)+9];
-	sprintf(outerLayer, "%sto_analyst%d%s",myname, data, message);
-
+	sprintf(outerLayer, "%sfromCol%d%s",myname, data, message);
+/*
+	Here's the ID string: "fromCol"
+*/
 
 	message = outerLayer;
+	
+//    encrypt_CD(message);
+    
+    //adding SSL from Collector to Director
+//    SSL_CD(message);
     
     //sending the string
     if(sendData(DIRECTORPORT, directorName, message)==0) {
@@ -156,7 +171,6 @@ int sending(int data, char* message) {
         //returning failure
         return 1;
     }
-     
     return 0;
 }
 
@@ -164,26 +178,24 @@ int checkDirector(int type) {
     //something to send to Director to identify the request
     char myName[50];
     gethostname(myName, sizeof(myName));
-
     char* message;
-    sprintf(message, "%d%s%s", type, CHECK_TYPE, myName);
-  
+    sprintf(message, "%d%s%s", type, TO_ANALYST, myName);
+  printf("%s\n", message);
     sendData(DIRECTORPORT, directorName, message);
     usleep(10000);
-    
-    char recMesg[100];
-    receiveData(DIRECTORPORT, recMesg);
-    printf("directors reply: %s\n", recMesg);
+	char* recMesg;
+//	char* decMesg;
+  receiveData(DIRECTORPORT, recMesg);
+//	SSL_read(recMesg, decMesg);
 	
 	char sucS[] = "success";
-	if(strcmp(recMesg, sucS) == 0){
+	if(strcmp(recMesg, sucS) == 0){//change to decMesg once decryption's up
 		return 0;
 	}
 	else{
 		return 1;
 	}
 }
-
 
 //receiving the processed Data from the director
 int receivingData() {
@@ -211,53 +223,46 @@ int receivingData() {
 
 int showData(){
 	FILE *listData;
-	listData= fopen("endUser", "r");
+	FILE *wallet =fopen("byteCoin", "r");
+	listData= fopen("endUser", "w+");
+//	if(listData == NULL){return 1;}
 	fseek(listData, sizeof(int), SEEK_SET);
 	char buff[100];
 	while(fgets(buff, 100, listData) != NULL){
+		printf("%s\n", buff);
+		
+	}
+	while(fgets(buff, 100, wallet) != NULL){
 		printf("%s\n", buff);
 	}
 	return 0;
  }
 
+
 int main(int argc, char* argv[]) {
     
-    if(argc!= 4) {
-        printf("usage: %s directorName bankName walletSize\n", argv[0]);
+    if(argc!= 6) {
+        printf("usage: %s directorName bankName walletSize typeName message\n", argv[0]);
         return 1;
     }
     
     directorName = argv[1];
     bankName = argv[2];
-    
-    int stash;
-    
+      
     printf("getting bank no.\n");
     getBankNumber();
     printf("got bank no.\n\n");
     
-    for (stash = 0; stash<atoi(argv[3]); stash++) {
-        printf("buying eCent %d\n", stash);
+    printf("buying eCent %d\n", 1);
         usleep(10000);
         buy_eCent();
-    }
+    
 
-    usleep(10000);
-    int type;
-    char* message = malloc(100*sizeof(char));
+    //sending(argv[4][0], argv[5]);
     
-    while(1) {
-        printf("type:   ");
-        scanf("%d", &type);
-        printf("message:    ");
-        scanf("%s", message);
-        
-        printf("Sending...\n\n");
-        sending(type, message);
-        continue;
-    }
-    
-    free(message);
+//	checkDirector(1);
+showData();
     return 0;
 }
+
 
