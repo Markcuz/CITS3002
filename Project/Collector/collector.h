@@ -1,3 +1,8 @@
+/**
+ * The bank
+ * \author Matthew Fitzpatrick 21297239
+ * \author Marcus Pham 20495924 
+ */
 
 #include <stdio.h>
 #include <stdlib.h>

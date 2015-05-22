@@ -1,14 +1,8 @@
-#define _GNU_SOURCE
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+/**
+ * The director
+ * \author Marcus Pham 20495924
+ * \debugging Matthew Fitzpatrick 21297239
+ */
 
 #include "comms.h"
 

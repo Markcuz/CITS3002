@@ -1,3 +1,9 @@
+/**
+ * The bank header
+ * \author Matthew Fitzpatrick 21297239 (main source)
+ * \author Marcus Pham 20495924 (debugging and skeleton)
+ */
+
 #include <stdio.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +18,6 @@
 
 #define BANKPORT "4951"
 
-//format sendMessage: <
 #include "comms.h"
 
 typedef struct {

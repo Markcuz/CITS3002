@@ -1,3 +1,8 @@
+/**
+ * The director
+ * \author Marcus Pham 20495924
+ * \debugging Matthew Fitzpatrick 21297239
+ */
 #include "director.h"
 
 /**

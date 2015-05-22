@@ -1,5 +1,10 @@
 
 #include "bank.h"
+/**
+ * The bank
+ * \author Matthew Fitzpatrick 21297239 (main source)
+ * \author Marcus Pham 20495924 (debugging and skeleton)
+ */
 
 //the banks own ID
 char banksID[20] = "0000000000000000000";

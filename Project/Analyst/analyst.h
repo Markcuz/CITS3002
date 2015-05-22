@@ -1,3 +1,9 @@
+/**
+ * The analyst
+ * \author Marcus Pham 20495924
+ * \author Matthew Fitzpatrick 21297239
+ */
+
 #include <stdio.h>
 #include "comms.h"
 

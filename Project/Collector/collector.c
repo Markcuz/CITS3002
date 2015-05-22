@@ -1,4 +1,8 @@
-
+/**
+ * The collector
+ * \author Matthew Fitzpatrick 21297239
+ * \author Marcus Pham 20495924
+ */
 #include "collector.h"
 
 /**
