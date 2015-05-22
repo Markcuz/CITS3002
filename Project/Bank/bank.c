@@ -1,8 +1,14 @@
 
 #include "bank.h"
 
+//the banks own ID
 char banksID[20] = "0000000000000000000";
 
+/**
+ * starts the economy
+ * creates 3 text files centdepot centbank bankacc
+ * stores all relevant econmy data inside files to cross check for authenticity later
+ */
 void econStart(){
 	FILE *centBanked = fopen("centdepot", "w+");
 	FILE *centList = fopen("centBank", "w+");
@@ -35,7 +41,12 @@ void econStart(){
 	fclose(centList);
 	fclose(lastAcc);
 }
-//receives eCent and checks for integrity, replies to analyst if good, deposit else discard
+
+/**
+ * checks the deposit coming from the analyst
+ * Rec Message: [deposit] <payment> <analystHostname>
+ * Sent message: "Well done you" on success, "You dun goofed, son" on failure
+ */
 int checkDeposit(char* recMessage, char* fromName){
 	char oldID[20];
 	char centS[11];
@@ -53,6 +64,7 @@ int checkDeposit(char* recMessage, char* fromName){
 		econStart();
 		centList = fopen("centBank", "r+");
 	}
+    
 	eCent cent;
 	fseek(centList, centID*sizeof(eCent), SEEK_SET);
 	fread(&cent, sizeof(eCent),1, centList);
@@ -78,23 +90,24 @@ int checkDeposit(char* recMessage, char* fromName){
 		sendMessage = decline;
 	}
 	char* ssld;
-	//SSL_write(ssld, sendMessage, strlen(sendMessage));
 	sendData(BANKPORT, fromName, ssld);
 	printf("%s\n", sendMessage);
 	return 0;
 }
 
+/**
+ * gives eCents to the collector
+ * Rec Message: [collect] <collectorHostname>
+ */
 int givePayment(char* recMessage, char* fromName) {
 	FILE *centBanked = fopen("centdepot", "r+");
 	if(centBanked == NULL){
 		econStart();
 		centBanked = fopen("centdepot","r+");
 	}
-	printf("EEYYYEOO%s\n", recMessage);
 	char ownID[20];
 	strncpy(ownID,recMessage+7, 19);
 	ownID[19] = '\0';
-	printf("checkingthisworks\n%s\n", ownID);
 	int a =0;
 	
 	FILE *lastAcc = fopen("bankAcc", "r+");
@@ -105,7 +118,8 @@ int givePayment(char* recMessage, char* fromName) {
 	if(lAc>= b && c < b){
 		a=a;
 	}
-	else{
+    
+	else {
 		char* badID = "Bad ID";
 		char* ssld;
 		//SSL_write(ssld, badID, strlen(badID));
@@ -136,6 +150,7 @@ int givePayment(char* recMessage, char* fromName) {
 		int bd = 0; //'t weren't empty before, but it sure is now.
 		fwrite(&bd, sizeof(int),1,centBanked); //update
 	}
+    
 	printf("ISA%d\n",a);
 	eCent cent;
 	char* sendMessage;
@@ -156,15 +171,20 @@ int givePayment(char* recMessage, char* fromName) {
 	fclose(centBanked);
 	fclose(centList);
     printf("fromName: %s\n", fromName);
+    
    	sendMessage = cents;
-	 printf("CASH: %s\n", sendMessage);
+    printf("CASH: %s\n", sendMessage);
 
-    //WARNING changed
     usleep(10000);
 	sendData(BANKPORT, fromName, sendMessage);
 	return 0;
 }
 
+/**
+ * initialises an account for the collector
+ * Rec Message: [initial] <collectorHostname>
+ * Send Message: the ID of the bank
+ */
 int giveAccount(char* fromName){
 	FILE *lastAcc = fopen("bankAcc", "r+");
     
@@ -185,15 +205,17 @@ int giveAccount(char* fromName){
 	fread(&nID,sizeof(int), 1, lastAcc);
 	printf("lastacc%d\n", nID);
     
-    printf("fromName: ..%s..", fromName);
     //sending is being a pain
     usleep(10000);
     
     //WARNING need to change to fromName
-	sendData(BANKPORT, "127.0.0.1", acnum);
-    printf("sent");
+	sendData(BANKPORT, fromName, acnum);
 	return 0;
 }
+
+/**
+ * parses the incoming message and returns an int corresponding to the action required
+ */
 int deParse(char* mesg){
 	char parse[8];
 	strncpy(parse, mesg, 7);
@@ -216,6 +238,12 @@ int deParse(char* mesg){
         return 3;
     }
 }
+
+/**
+ * finds the hostname of the person requiring service
+ * returns the pointer to the hostname string
+ * Rec message: <identifier> <data> <hostname>
+ */
 char *findName(char* recMessage, int cas){
     char* name;
     
@@ -227,23 +255,22 @@ char *findName(char* recMessage, int cas){
     
     printf("name: %s \n", name);
     return name;
-	
 }
 
-//message: <type> <fromName>
+/**
+ * receives the messages to the bank and parses them
+ * message: <type> <data> <fromName>
+ * returns 0 on success 1 on failure
+ */
 int receiveBankMessage() {
-	printf("HERE\n");
 	char deMec[100];
 	char datMec[100];
 	char* recMessage; // for received transmission
 	recMessage = deMec;
 	receiveData(BANKPORT, recMessage);
-    	printf("TWO\n");
 	//sprintf(deMec, "%s\n\n\nTHAT'S ALL FOLKS\n", recMessage);
 	recMessage = deMec;
-	printf("TWO%s\n", deMec);
 	int deposit = deParse(recMessage);
-//the incoming message addressName
 	char* fromName;
 	if(deposit == 0){
 			fromName = findName(recMessage, 36);
@@ -271,26 +298,35 @@ int receiveBankMessage() {
     }
 	return 0;
 }
-              
-              int main() {
+
+/**
+ * the main function
+ * prints its own hostname for use
+ * starts economy
+ * then begins an infinite loop receiving messages to the bank, processes them accordingly
+ * returns 1 on error, otherwise never returns
+ */
+int main() {
+    char hostname[100];
+    gethostname(hostname, sizeof(hostname));
+    printf("Bank Hostname: %s\n",hostname);
                   
-                  char hostname[100];
-                  gethostname(hostname, sizeof(hostname));
-                  printf("Bank Hostname: %s\n",hostname);
-                  
-                 printf("Economy started\n");
-                  econStart();
-                  printf("Economy finished\n");
-                  while(1) {
-                      if(receiveBankMessage()!=0) {
-                          printf("bad bank message");
-                          return 1;
-                      }
-                      printf("Completed Transaction! \n\n");
-                      printf("Bank Hostname: %s\n",hostname);
-                  }
-                  return 0;
-              }
+    printf("Economy started\n");
+    econStart();
+    printf("Economy finished\n");
+    
+    while(1) {
+        if(receiveBankMessage()!=0) {
+            printf("Bad bank message");
+                return 1;
+        }
+        else {
+            printf("Completed Transaction! \n\n");
+            printf("Bank Hostname: %s\n",hostname);
+        }
+    }
+    return 1;
+}
               
               
        
