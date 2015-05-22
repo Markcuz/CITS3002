@@ -156,11 +156,12 @@ int givePayment(char* recMessage, char* fromName) {
 	fclose(centBanked);
 	fclose(centList);
     printf("fromName: %s\n", fromName);
-    printf("CASH: %s\n", cents);
-    sendMessage =cents;
+   	sendMessage = cents;
+	 printf("CASH: %s\n", sendMessage);
+
     //WARNING changed
     usleep(10000);
-	sendData(BANKPORT, "127.0.0.1", sendMessage);
+	sendData(BANKPORT, fromName, sendMessage);
 	return 0;
 }
 
