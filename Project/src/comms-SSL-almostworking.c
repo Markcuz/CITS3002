@@ -23,7 +23,7 @@ typedef struct {
 // For this example, we'll be testing on openssl.org
 
 // Establish a regular tcp connection
-int tcpConnect (char* hostname, int port)
+int tcpConnect(char* hostname, int port)
 {
   int error, handle;
   struct hostent *host;
@@ -201,7 +201,6 @@ void sslWrite (connection *c, char *text)
     SSL_write (c->sslHandle, text, strlen (text));
 }
 
-// Very basic main: we send GET / and print the response.
 int sendData(char* hostname, char *port, char* message)
 {
   connection *c;
@@ -210,9 +209,9 @@ int sendData(char* hostname, char *port, char* message)
   c = sslConnect (hostname, port);
 
   sslWrite (c, message);
-//  response = sslRead (c);
+  response = sslRead (c);
 
-//  printf ("%s\n", response);
+  printf ("%s\n", response);
 
   sslDisconnect (c);
   free (response);
@@ -231,14 +230,14 @@ int receiveData(char* port, char *receivedMessage)
 
   printf("received: %s\n", receivedMessage);
 
-  sslDisconnect (c);
+  sslDisconnect(c);
  
   return 0;
 
 }
 
 
-int main() {
+int main() { //needs a server to test
 	char* rec;
 	sendData("127.0.0.1", "4444", "hello");
 	receiveData("4444", rec);
