@@ -167,7 +167,7 @@ int sending(int data, char* message) {
 	char myname[50];
 	gethostname(myname, sizeof(myname));
 	char outerLayer[strlen(message)+strlen(myname)+9];
-	sprintf(outerLayer, "%sto_analyst%d%s",data, message, myname);
+	sprintf(outerLayer, "%dto_analyst%s%s",data, message, myname);
 
 	message = outerLayer;
 	
@@ -288,7 +288,7 @@ int main(int argc, char* argv[]) {
     printf("got bank no.\n\n");
     
     int i;
-    for(i=0; i<argv[3]; i++) {
+    for(i=0; i<atoi(argv[3]); i++) {
         printf("buying eCent package no. %d\n", 1);
         usleep(10000);
         buy_eCent();
