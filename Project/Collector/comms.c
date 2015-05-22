@@ -1,4 +1,8 @@
 #include "comms.h"
+/*
+ * Source predominantly done by Brian 'Beej Jorgensen" Hall, beej@beej.us from Beej's Guide to Network Programming
+ * Modified by Marcus Pham
+ */
 
 int sendData(char* port, char* hostname, char* message) {
     int sockfd;
