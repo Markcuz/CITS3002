@@ -56,20 +56,24 @@ int checkType(char* message){
             break;
         }
     }
+    fclose(table);
     
     //finds the collector name
     char* fromName = strstr(message, CHECK_TYPE)+sizeof(CHECK_TYPE)-1;
     fprintf(stdout, "Collector hostname: %s\n", fromName);
     
     if(typeAvail) {
-        char retMessage[10] = "success";
-        fprintf(stdout, "success");
+        char retMessage[15] = "success";
+        fprintf(stdout, "successful?: %s\n", retMessage);
+        usleep(100000);
         sendData(DIRECTORPORT, fromName, retMessage);
         return 0;
     }
     else {
         char retMessage[10] = "failure";
+        retMessage[7]='\0';
         fprintf(stdout, "failure");
+        usleep(100000);
         sendData(DIRECTORPORT, fromName, retMessage);
         return 0;
     }
@@ -165,31 +169,37 @@ int deParseMessage(char* recMessage) {
  * \return 0 for success, 1 failure
  */
 int receiveDirectorMessage() {
-    char recMessage[100];
+    char recMessage[200];
     receiveData(DIRECTORPORT, recMessage);
     
     printf("Received Message: %s\n", recMessage);
+    
     int messageType = deParseMessage(recMessage);
     
-    fprintf(stdout, "Message Type: %d\n", messageType);
+    printf("Message Type: %d\n", messageType);
     
     switch(messageType) {
         case 0:
             forwardingToCollector(recMessage);
+            return 0;
             break;
         case 1:
             checkType(recMessage);
+            printf("finished");
+            return 0;
             break;
         case 2:
             forwardingToAnalyst(recMessage);
+            return 0;
             break;
         case 3:
             addAnalyst(recMessage);
+            return 0;
             break;
         default:
             return 1;
     }
-    return 1;
+    return 0;
 }
 
 /**
@@ -199,10 +209,8 @@ int receiveDirectorMessage() {
  */
 int main() {
     char hostname[100];
-    gethostname(hostname, sizeof(hostname));
+    myIP(hostname);
     printf("Director Hostname: %s\n",hostname);
-    
-    receiveDirectorMessage();
     
     while(1) {
         receiveDirectorMessage();

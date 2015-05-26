@@ -57,6 +57,7 @@ int receiveData(char* port, char* receivedMessage) {
     struct sockaddr_storage their_addr;
     socklen_t addr_len;
     char s[INET6_ADDRSTRLEN];
+    char buf[MAXBUFLEN];
     
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC; // set to AF_INET to force IPv4
@@ -94,18 +95,42 @@ int receiveData(char* port, char* receivedMessage) {
     printf("listener: waiting to recvfrom...\n");
     
     addr_len = sizeof their_addr;
-    if ((numbytes = recvfrom(sockfd, receivedMessage, MAXBUFLEN-1 , 0,
+    if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,
                              (struct sockaddr *)&their_addr, &addr_len)) == -1) {
         perror("recvfrom");
         return 1;
     }
     
     printf("listener: packet is %d bytes long\n", numbytes);
-    receivedMessage[numbytes] = '\0';
-    printf("listener: packet contains \"%s\"\n", receivedMessage);
+    buf[numbytes] = '\0';
+    printf("listener: packet contains \"%s\"\n", buf);
     
+    memcpy(receivedMessage, buf, numbytes+1);
+    
+    printf("listener: packet contains \"%s\"\n", receivedMessage);
     
     close(sockfd);
     
+    return 0;
+}
+
+int myIP(char* myIPAddr) {
+    struct ifaddrs *addrs, *tmp;
+    
+    getifaddrs(&addrs);
+    tmp = addrs;
+    
+    while (tmp){
+        if (tmp->ifa_addr && tmp->ifa_addr->sa_family == AF_INET) {
+            struct sockaddr_in *pAddr = (struct sockaddr_in *)tmp->ifa_addr;
+            if(strcmp("eth0", tmp->ifa_name)==0) {
+                strcpy(myIPAddr, inet_ntoa(pAddr->sin_addr));
+                //printf("myIP: %s", myIPAddr);
+            }
+        }
+        tmp = tmp->ifa_next;
+    }
+    
+    freeifaddrs(addrs);
     return 0;
 }

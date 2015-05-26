@@ -14,7 +14,7 @@ int registerService(int type) {
     char sendMessage[100];
     
     char myName[20];
-    gethostname(myName, sizeof(myName));
+    myIP(myName);
     
     sprintf(sendMessage, "%d%s%s", serviceType, ADD_ANALYST, myName);
 
@@ -104,12 +104,15 @@ int processData(char* message, char* collName) {
 int depositPayment(char* payment) {
     
     char name[50];
-    gethostname(name, sizeof(name));
+    myIP(name);
     
     char* dpayment;
     char bMessage[strlen(payment)+7+strlen(name)];
+    
+    //need to strip off the coll hostname
+    
+    
     sprintf(bMessage, "deposit%s%s",payment, name);
-    dpayment= bMessage;
     
     printf("sending message: %s\n", dpayment);
     sendData(BANKPORT, bankName, dpayment);

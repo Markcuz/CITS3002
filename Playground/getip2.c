@@ -1,12 +1,16 @@
 #define _GNU_SOURCE     /* To get defns of NI_MAXSERV and NI_MAXHOST */
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
+#include <netinet/in.h>
+#include <net/if.h>
 #include <netdb.h>
 #include <ifaddrs.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-//#include <linux/if_link.h>
+#include <linux/if_link.h>
 
 int main(int argc, char *argv[])
 {
@@ -51,16 +55,16 @@ int main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
             }
             
-            printf("\t\taddress: <%s>\n", host);
+            printf("%s\n", host);
             
-        } else if (family == AF_PACKET && ifa->ifa_data != NULL) {
+        } /*else if (family == AF_PACKET && ifa->ifa_data != NULL) {
             struct rtnl_link_stats *stats = ifa->ifa_data;
             
             printf("\t\ttx_packets = %10u; rx_packets = %10u\n"
                    "\t\ttx_bytes   = %10u; rx_bytes   = %10u\n",
                    stats->tx_packets, stats->rx_packets,
                    stats->tx_bytes, stats->rx_bytes);
-        }
+        }*/
     }
     
     freeifaddrs(ifaddr);

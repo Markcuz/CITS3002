@@ -16,7 +16,7 @@ int getBankNumber(){
 	char* message = "";
  
 	char myNameIs[50];
-	gethostname(myNameIs, sizeof(myNameIs));
+	myIP(myNameIs);
 	char nameIs[57] = "initial";
 	strcat(nameIs, myNameIs);
 	char* marshalMathers = nameIs;
@@ -95,7 +95,7 @@ int receiveeCent(){
  * receives the eCent
  */
 int buy_eCent() {
-    char* message ;
+    char* message;
 	FILE *wallet; 
 
 	wallet = fopen("byteCoin", "r+");//opening hard storage of eCent numbers
@@ -106,17 +106,25 @@ int buy_eCent() {
 	}
 	
     char myNameIs[50];
-    gethostname(myNameIs, sizeof(myNameIs));
+    myIP(myNameIs);
+    
+    printf(" my hostname: %s\n", myNameIs);
     
 	char bID[20];
 	fgets(bID, 20, wallet);
 	sprintf(bID, "%019d", 1);
 	message = bID;
 	sprintf(type, "collect%s", message);
-    sprintf(message, "%s%s", type, myNameIs);
+    
+    printf("message before hsotname: %s", message);
+    
+    sprintf(message, "%s", type);
+    
+    printf("message Sent: %s", message);
+    
+    usleep(100000);
 	sendData(BANKPORT, bankName, message);
-	receiveeCent();	
-	//usleep(10000);
+	receiveeCent();
 	fclose(wallet);
 
     return 0;
@@ -136,7 +144,7 @@ int sending(int data, char* message) {
     }
     
     //add something to front of string to identify a data exchange
-    /* somethign to put together encrypted stirng*/
+     //somethign to put together encrypted stirng
     //adding encryption from Collector to Director (CD)
 	char myID[20];
 	char witCoin[strlen(message) + 30];
@@ -165,21 +173,25 @@ int sending(int data, char* message) {
 	witCoin[-1] ='\0';
 	message = witCoin;
     
+    fclose(wallet);
+    
 //	encrypt_CA(message);
 //	SSL_CA(message);
     
 	char myname[50];
-	gethostname(myname, sizeof(myname));
+	myIP(myname);
 	char outerLayer[strlen(message)+strlen(myname)+9];
 	sprintf(outerLayer, "%dto_analyst%s%s",data, message, myname);
 
 	message = outerLayer;
 	
+    printf("sending: %s", message);
 //    encrypt_CD(message);
     
     //adding SSL from Collector to Director
 //    SSL_CD(message);
     
+    usleep(1000000);
     if(sendData(DIRECTORPORT, directorName, message)==0) {
         printf("Sent data");
         return 0;
@@ -200,24 +212,27 @@ int sending(int data, char* message) {
 int checkDirector(int type) {
     //something to send to Director to identify the request
     char myName[50];
-    gethostname(myName, sizeof(myName));
-    char* message;
-    sprintf(message, "%d%s%s", type, TO_ANALYST, myName);
-    printf("Sending message: %s\n", message);
-    sendData(DIRECTORPORT, directorName, message);
-    usleep(10000);
+    myIP(myName);
     
-	char* recMesg;
-  receiveData(DIRECTORPORT, recMesg);
+    char message[100];
+    sprintf(message, "%d%s%s", type, CHECK_TYPE, myName);
+    printf("Sending message: %s\n", message);
+    
+    sendData(DIRECTORPORT, directorName, message);
+    
+	char recMesg[100];
+    receiveData(DIRECTORPORT, recMesg);
 //	SSL_read(recMesg, decMesg);
 	
 	char sucS[] = "success";
 	if(strcmp(recMesg, sucS) == 0){//change to decMesg once decryption's up
-		return 0;
+        return 0;
 	}
 	else{
 		return 1;
 	}
+    return 1;
+    
 }
 
 /**
@@ -304,11 +319,13 @@ int main(int argc, char* argv[]) {
     while(1) {
         printf("type:   ");
         scanf("%d", &type);
+        //checkdirector
         printf("message:    ");
         scanf("%s", message);
         
         printf("Sending...\n\n");
         sending(type, message);
+        usleep(100000);
         continue;
     }
  

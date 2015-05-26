@@ -175,12 +175,12 @@ int givePayment(char* recMessage, char* fromName) {
 	cents[-1] = '\0';
 	fclose(centBanked);
 	fclose(centList);
-    printf("fromName: %s\n", fromName);
+    printf("fromName: ..%s..\n", fromName);
     
    	sendMessage = cents;
     printf("CASH: %s\n", sendMessage);
 
-    usleep(10000);
+    usleep(100000);
 	sendData(BANKPORT, fromName, sendMessage);
 	return 0;
 }
@@ -211,7 +211,7 @@ int giveAccount(char* fromName){
 	printf("lastacc%d\n", nID);
     
     //sending is being a pain
-    usleep(10000);
+    usleep(1000000);
     
     //WARNING need to change to fromName
 	sendData(BANKPORT, fromName, acnum);
@@ -313,8 +313,8 @@ int receiveBankMessage() {
  */
 int main() {
     char hostname[100];
-    gethostname(hostname, sizeof(hostname));
-    printf("Bank Hostname: %s\n",hostname);
+    myIP(hostname);
+    printf("Bank IP: %s\n",hostname);
                   
     printf("Economy started\n");
     econStart();
