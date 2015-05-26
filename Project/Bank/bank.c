@@ -160,6 +160,7 @@ int givePayment(char* recMessage, char* fromName) {
 	eCent cent;
 	char* sendMessage;
 	char cents[a*11 +1]; // compilation of the eCent IDs.
+	cents[0]= '\0';
 	FILE *centList = fopen("centBank", "r+"); //open the log of who owns which eCents
 	for(int i=0; i<a; i++){
 		fread(&cent, sizeof(eCent), 1, centBanked); //get ecent from the bank's cache
