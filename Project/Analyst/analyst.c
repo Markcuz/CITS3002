@@ -53,6 +53,7 @@ int receiveDataToProcess() {
     
     //have to check this
     strncpy(payment, recMessage,29);
+    printf("PaymentCheck: %s\n", payment);// Checking that the payment is right on this side of the bank
     
     char* message = malloc(100 * sizeof(char));//DATA
     
@@ -113,7 +114,8 @@ int depositPayment(char* payment) {
     
     
     sprintf(bMessage, "deposit%s%s",payment, name);
-    
+    printf("bMessage check: %s\n", bMessage);
+    dpayment = bMessage; // You forgot this
     printf("sending message: %s\n", dpayment);
     sendData(BANKPORT, bankName, dpayment);
     
