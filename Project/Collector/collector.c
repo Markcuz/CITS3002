@@ -35,6 +35,7 @@ int getBankNumber(){
     printf("Receiving bank number\n");
 	receiveData(BANKPORT, message);
     printf("Got number!");
+    printf("\nNumber is: %s\n", message); 
 	
 	fwrite(message, 19, 1, wallet);
 	fwrite(&numCoin, 12, 1, wallet);
