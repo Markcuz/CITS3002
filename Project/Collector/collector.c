@@ -13,7 +13,7 @@
  */
 int getBankNumber(){
 	FILE *wallet;
-	char* message = "";
+	char* message;
  
 	char myNameIs[50];
 	myIP(myNameIs);
@@ -25,7 +25,7 @@ int getBankNumber(){
 	sendData(BANKPORT, bankName, marshalMathers);
 	
 	char newNum[20];
-	sprintf(newNum, "%s", message);
+	sprintf(newNum, "%s", message); // seems pointless, as message should be empty
 	newNum[19] = '\0';
 	char numCoin[12];
 	sprintf(numCoin, "%010d\n", 0);
@@ -163,7 +163,7 @@ int sending(int data, char* message) {
 		fgets(witCoin, 11, wallet);
 	}
 	int z = atoi(witCoin);
-	z--;
+	z--;/*
 	sprintf(witCoin, "%010d\n", z);
 	fread(myID, 20, 1, wallet);
 	fwrite(witCoin, 11, 1, wallet);
@@ -172,7 +172,19 @@ int sending(int data, char* message) {
 	fread(witCoin+19, 10, 1, wallet);
 	sprintf(witCoin+30,"%s", message);
 	witCoin[-1] ='\0';
+	message = witCoin;*/
+	
+	sprintf(witCoin, "%010d\n", z);
+	fread(myID, 20, 1, wallet);
+	fwrite(witCoin, 11, 1, wallet);
+	fseek(wallet, z*(11), SEEK_CUR);
+	char coinID[11];
+	fread(coinID, 10, 1, wallet);
+	coinID[10] = '\0';
+	sprintf(witCoin,"%s%s%s", myID, coinID, message);
+	witCoin[-1] ='\0';
 	message = witCoin;
+
     
     fclose(wallet);
     
