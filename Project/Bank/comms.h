@@ -15,7 +15,7 @@
 #include <string.h>
 #include <linux/if_link.h>
 
-#define MAXBUFLEN 100
+#define MAXBUFLEN 1000
 
 int sendData(char* port, char* hostname, char* message);
 

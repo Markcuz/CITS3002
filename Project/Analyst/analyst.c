@@ -31,41 +31,38 @@ int registerService(int type) {
  * on failure returns "failure" [to_collector] <collectorHostname>
  */
 int receiveDataToProcess() {
-    char* recMessage = malloc(100 * sizeof(char));
+    char recMessage[200];
     
     printf("Receiving data\n");
     receiveData(DIRECTORPORT, recMessage);
     printf("Received message: %s\n", recMessage);
     
     char collName[100];
-
     
 	char* dN = strstr(recMessage, TO_ANALYST);
 	char* dirName = dN+(strlen(TO_ANALYST));// actually the collector's IP
-	char colMessage[(strlen(recMessage)-strlen(dN) - 29)];
-	strncpy(colMessage, recMessage+29, sizeof(colMessage));
+	char colMessage[(strlen(recMessage)-strlen(dN) - 28)];
+    printf("%d\n", sizeof(colMessage));
+	strncpy(colMessage, recMessage+29, sizeof(colMessage)-1);
     printf("dN: %s\n", dN);
     printf("dirName: %s\n", dirName);
     sprintf(collName, "%s", dirName);
     
-		
-	
     
     //splitting up the message into eCent and message (after stripping layers)
-	char payment[29];//format(ownerBankID, coinID)
-    
+	char payment[30];//format(ownerBankID, coinID)
+    colMessage[-1] ='\0';
+    printf("%s\n", colMessage);
     //have to check this
     strncpy(payment, recMessage,29);
+    payment[29] = '\0';
     printf("PaymentCheck: %s\n", payment);// Checking that the payment is right on this side of the bank
     
     char* message = malloc(100 * sizeof(char));//DATA
-    free(recMessage);
     //on successful deposit
     if(depositPayment(payment)==0) {
         processData(colMessage,collName);
-        free(collName);
         free (message);
-        
         return 0;
     }
 
@@ -73,9 +70,7 @@ int receiveDataToProcess() {
       char failMessage[8+strlen(collName)];
       sprintf(failMessage, "failure%s",collName);
         sendData(DIRECTORPORT, directorName, failMessage);
-        free(collName);
         free (message);
-        
         return 1;
     }
     return 1;
@@ -90,8 +85,10 @@ int receiveDataToProcess() {
 int processData(char* message, char* collName) {
     printf("Processing data\n");
     char sendMessage[256];
-    
-    sprintf(sendMessage, "%s%d%s%s", message, serviceType, TO_COLLECTOR, collName);
+    char dMesg[strlen(message)];
+    sprintf(dMesg, "%s", message);
+    dMesg[-1] = '\0';
+    sprintf(sendMessage, "%s%d%s%s", dMesg, serviceType, TO_COLLECTOR, collName);
     printf("Sending Message: %s\n", sendMessage);
     
     sendData(DIRECTORPORT, directorName, sendMessage);
@@ -123,7 +120,7 @@ int depositPayment(char* payment) {
     
     //cehcking for the success message
     char allGood[] = "Well done you";
-    char* response = "";
+    char response[100];
 	receiveData(BANKPORT, response);
     printf("reply message: %s\n", response);
     

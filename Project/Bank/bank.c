@@ -53,7 +53,10 @@ void econStart(){
  * Sent message: "Well done you" on success, "You dun goofed, son" on failure
  */
 int checkDeposit(char* recMessage, char* fromName){
-	char oldID[20];
+    
+    printf("checking deposit");
+	
+    char oldID[20];
 	char centS[11];
 
 	strncpy(oldID,recMessage+7, 19);
@@ -62,40 +65,43 @@ int checkDeposit(char* recMessage, char* fromName){
 	centS[10]='\0';
 	int centID = atoi(centS);
 
-	char* sendMessage; 
+	char* sendMessage;
 	FILE *centList;
 	centList = fopen("centBank", "r+");
 	if(centList == NULL){
 		econStart();
 		centList = fopen("centBank", "r+");
 	}
+    char accept[] = "Well done you";
+    char decline[] = "You dun goofed, son.";// Nack message;
     
 	eCent cent;
 	fseek(centList, centID*sizeof(eCent), SEEK_SET);
 	fread(&cent, sizeof(eCent),1, centList);
 	if((strcmp(cent.owner, oldID)==0) && (strcmp(cent.owner, banksID)!=0)){ //got the correct previous owner
 		strcpy(cent.owner, banksID);
-		fseek(centList, centID*sizeof(eCent), SEEK_SET);
+    	fseek(centList, centID*sizeof(eCent), SEEK_SET);
 		fwrite(&cent, sizeof(eCent), 1, centList); //updating owner to bank.
 		fclose(centList); 
-		FILE *centBanked = fopen("centdepot", "r+"); //storing the eCent with the rest of the bank's cache.
+    	FILE *centBanked = fopen("centdepot", "r+"); //storing the eCent with the rest of the bank's cache.
 		int stash; //number of stored eCents
-		fread(&stash, sizeof(int), 1, centBanked); 
-		fseek(centBanked, stash*sizeof(eCent), SEEK_CUR); //to the stored eCents stack
-		fwrite(&cent, sizeof(eCent), 1, centBanked); //pushing to top of stack
-		fseek(centBanked, 0, SEEK_SET);//back to storage number
-		stash++;
+		fread(&stash, sizeof(int), 1, centBanked);
+        fseek(centBanked, stash*sizeof(eCent), SEEK_CUR); //to the stored eCents stack
+    	fwrite(&cent, sizeof(eCent), 1, centBanked); //pushing to top of stack
+        fseek(centBanked, 0, SEEK_SET);//back to storage number
+        stash++;
 		fwrite(&stash, sizeof(int), 1, centBanked); //updating number of stored eCents
 		fclose(centBanked);
-		char accept[] = "Well done you";
-		sendMessage = accept; //something something ack message;
+
+        sendMessage = accept; //something something ack message;
 	}
 	else{
-		char decline[] = "You dun goofed, son.";//something something Nack message;
+		
 		sendMessage = decline;
 	}
-	char* ssld;
-	sendData(BANKPORT, fromName, ssld);
+	
+    usleep(1000000);
+	sendData(BANKPORT, fromName, sendMessage);
 	printf("%s\n", sendMessage);
 	return 0;
 }
@@ -168,12 +174,12 @@ int givePayment(char* recMessage, char* fromName) {
 		fseek(centList, (cent.identifier*(sizeof(eCent))), SEEK_SET); //looking up eCent's entry in owner table
 		
 		fwrite(&cent, sizeof(eCent), 1, centList); //update owner table
-		char tempCent[12]; //temp string for strncat
-		sprintf(tempCent, "%010d\n", cent.identifier); //add eCent number to string
-		tempCent[11] = '\0';
+		char tempCent[11]; //temp string for strncat
+		sprintf(tempCent, "%010d", cent.identifier); //add eCent number to string
+		tempCent[10] = '\0';
 		strncat(cents,tempCent, 11);
 	}
-	cents[-1] = '\0';
+	
 	fclose(centBanked);
 	fclose(centList);
     printf("fromName: ..%s..\n", fromName);

@@ -17,7 +17,7 @@
 
 #include "comms.h"
 
-#define MAXBUFLEN 100
+
 
 #define DIRECTORPORT "4950"
 #define BANKPORT "4951"
@@ -28,15 +28,16 @@
 char* directorName;
 char* bankName;
 
-int sending(int data, char* Software);//sends dataType and eCent to Director
+int sending(char* data, char* Software);//sends dataType and eCent to Director
 
 int buy_eCent(void); //buys (gains an eCent from the bank)
 
-int checkDirector(int dataType); //checks Director
+int checkDirector(char dataType); //checks Director
 
 int receiving(void); //receive the data
 
 //splits the message into to corresponding eCent and stores it for later use
 int storeeCent(char* message);
 
+int receivingData();
 

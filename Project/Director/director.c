@@ -65,7 +65,7 @@ int checkType(char* message){
     if(typeAvail) {
         char retMessage[15] = "success";
         fprintf(stdout, "successful?: %s\n", retMessage);
-        usleep(100000);
+        usleep(200000);
         sendData(DIRECTORPORT, fromName, retMessage);
         return 0;
     }
@@ -73,7 +73,7 @@ int checkType(char* message){
         char retMessage[10] = "failure";
         retMessage[7]='\0';
         fprintf(stdout, "failure");
-        usleep(100000);
+        usleep(200000);
         sendData(DIRECTORPORT, fromName, retMessage);
         return 0;
     }
@@ -90,13 +90,13 @@ int forwardingToCollector(char* recMessage) {
     junk = strstr(recMessage, TO_COLLECT);
     
     int len = strlen(recMessage)-strlen(junk);
-    char sendString[len];
+    char sendString[1+len];
     
     strncpy(sendString, recMessage, len);
-    
+    sendString[-1] = '\0';
     fprintf(stdout, "Sending message: %s\n", sendString);
     
-    char* toName = junk+strlen(TO_COLLECT)+2;
+    char* toName = junk+strlen(TO_COLLECT);
     
     printf("sendingTo: %s", toName);
     sendData(DIRECTORPORT, toName, sendString);

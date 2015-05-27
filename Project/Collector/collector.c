@@ -5,6 +5,26 @@
  */
 #include "collector.h"
 
+
+/**
+ * prints the data in the endUser file
+ */
+int showData(){
+    FILE *listData;
+    FILE *wallet =fopen("byteCoin", "r");
+    listData= fopen("endUser", "w+");
+    //	if(listData == NULL){return 1;}
+    fseek(listData, sizeof(int), SEEK_SET);
+    char buff[100];
+    while(fgets(buff, 100, listData) != NULL){
+        printf("%s\n", buff);
+        
+    }
+    while(fgets(buff, 100, wallet) != NULL){
+        printf("%s\n", buff);
+    }
+    return 0;
+}
 /**
  * gets the bank number (initialises account)
  * send Message: [initial] <myHostname>
@@ -90,10 +110,10 @@ int receiveeCent(){
  
 	fwrite(&coin, sizeof(coin), 1, wallet);
 	fseek(wallet, 19, SEEK_SET);
-	sprintf(coin, "%010d\n", 10);
-	fwrite(&coin, 11, 1, wallet);
+	sprintf(coin, "%010d", 10);
+	fwrite(&coin, 10, 1, wallet);
 	fclose(wallet);
- 
+    
 	return 0;
 }
 
@@ -145,10 +165,10 @@ int buy_eCent() {
  * sends the actual data requiring analysis
  * send Message: <dataType> <payment> <data> [to_analyst] <myHostname>
  */
-int sending(int data, char* message) {
-
+int sending(char* data, char* message) {
+    char daType = data[0];
     //need to check the director
-    if(checkDirector(data) != 0) {
+    if(checkDirector(daType) != 0) {
         printf("Not valid type");
         return 1;
         //wait for a while? until director has an analyst?
@@ -161,6 +181,7 @@ int sending(int data, char* message) {
 	char walSize[11];
 	char witCoin[strlen(message) + 30];
 	FILE *wallet;
+    showData();
 	wallet = fopen("byteCoin", "r+");
 	if(wallet == NULL){
 		buy_eCent();
@@ -180,7 +201,7 @@ int sending(int data, char* message) {
 	printf("WALLET_SIZE: %d\n", z);
 	fseek(wallet, 19, SEEK_SET);
 	fwrite(&walSize, 10, 1, wallet);
-	fseek(wallet, z*(11), SEEK_CUR);
+	fseek(wallet, z*(10), SEEK_CUR);
 	char coinID[11];
 	fread(coinID, 10, 1, wallet);
 	coinID[10] = '\0';
@@ -196,7 +217,7 @@ int sending(int data, char* message) {
 	char myname[50];
 	myIP(myname);
 	char outerLayer[strlen(message)+strlen(myname)+9];
-	sprintf(outerLayer, "%d%sto_analyst%s",data, message, myname);
+	sprintf(outerLayer, "%c%sto_analyst%s",daType, message, myname);
 
 	message = outerLayer;
 	
@@ -205,6 +226,7 @@ int sending(int data, char* message) {
     usleep(1000000);
     if(sendData(DIRECTORPORT, directorName, message)==0) {
         printf("Sent data");
+        receivingData();
         return 0;
     }
     else {
@@ -220,13 +242,13 @@ int sending(int data, char* message) {
  * rec Message: "success" or "failure"
  * returns 0 on success, 1 on failure
  */
-int checkDirector(int type) {
+int checkDirector(char type) {
     //something to send to Director to identify the request
     char myName[50];
     myIP(myName);
     
     char message[100];
-    sprintf(message, "%d%s%s", type, CHECK_TYPE, myName);
+    sprintf(message, "%c%s%s", type, CHECK_TYPE, myName);
     printf("Sending message: %s\n", message);
     
     sendData(DIRECTORPORT, directorName, message);
@@ -279,25 +301,7 @@ int receivingData() {
 	return 0;
 }
 
-/**
- * prints the data in the endUser file
- */
-int showData(){
-	FILE *listData;
-	FILE *wallet =fopen("byteCoin", "r");
-	listData= fopen("endUser", "w+");
-//	if(listData == NULL){return 1;}
-	fseek(listData, sizeof(int), SEEK_SET);
-	char buff[100];
-	while(fgets(buff, 100, listData) != NULL){
-		printf("%s\n", buff);
-		
-	}
-	while(fgets(buff, 100, wallet) != NULL){
-		printf("%s\n", buff);
-	}
-	return 0;
- }
+
 
 /**
  * the main function
@@ -326,12 +330,18 @@ int main(int argc, char* argv[]) {
         buy_eCent();
     }
     
-    int type;
+    char type[2000];
     char* message = malloc(100*sizeof(char));
     
     while(1) {
         printf("type:   ");
-        scanf("%d", &type);
+        scanf("%s", type);
+        if(strlen(type )!= 1){
+            printf("Ending collector script. Printing received messages\n\n");
+            showData();
+            return 0;
+        }
+        
         //checkdirector
         printf("message:    ");
         scanf("%s", message);

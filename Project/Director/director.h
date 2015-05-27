@@ -7,7 +7,6 @@
 #include "comms.h"
 
 #define DIRECTORPORT "4950"
-#define MAXBUFLEN 100
 
 #define TO_COLLECT "to_collect"
 #define TO_ANALYST "to_analyst"
