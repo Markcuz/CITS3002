@@ -10,9 +10,25 @@
  * prints the data in the endUser file
  */
 int showData(){
-    FILE *listData;
+    /*FILE *listData;
     FILE *wallet =fopen("byteCoin", "r");
-    listData= fopen("endUser", "w+");
+    
+    if(wallet== NULL){
+        fopen("byteCoin", "w+");
+        printf("Nothing in File");
+        return 1;
+    }
+    
+    listData= fopen("endUser", "r+");
+    
+    if(listData== NULL){
+        listData= fopen("endUser", "w+");
+        fclose(listData);
+        fclose(wallet);
+        printf("Nothing in File");
+        return 1;
+    }
+    
     char buff[100];
     while(fgets(buff, 100, listData) != NULL){
         printf("%s\n", buff);
@@ -21,6 +37,9 @@ int showData(){
     while(fgets(buff, 100, wallet) != NULL){
         printf("%s\n", buff);
     }
+    
+    fclose(listData);
+    fclose(wallet);*/
     return 0;
 }
 /**
@@ -273,28 +292,21 @@ int checkDirector(char type) {
  */
 int receivingData() {
     FILE *listData;
-    int list;
-    listData = fopen("endUser", "r+");
+    listData = fopen("endUser", "a");
+    
     if(listData == NULL){
         listData = fopen("endUser", "w+");
-        list = 0;
-        fwrite(&list, sizeof(int), 1, listData);
-    }
-    
-    else{
-        fread(&list, sizeof(int), 1, listData);
     }
     char datalink[200];
-    char* gotData;
-    gotData = datalink;
+    
     char* message;
-    receiveData(DIRECTORPORT, gotData);
-    //	SSL_read(gotData, message, strlen(gotData));
-    fseek(listData, list*strlen(message), SEEK_CUR);
-    list++;
-    fwrite(&message, strlen(message), 1, listData);
-    fseek(listData, 0, SEEK_SET);
-    fwrite(&list, sizeof(int), 1, listData);
+    message = datalink;
+    receiveData(DIRECTORPORT, message);
+    
+    fwrite(message, strlen(message), 1, listData);
+    
+    fwrite("\n",sizeof(char),1, listData);
+    
     fclose(listData);
     return 0;
 }
