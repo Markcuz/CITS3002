@@ -21,12 +21,13 @@ int getBankNumber(){
 	strcat(nameIs, myNameIs);
 	char* marshalMathers = nameIs;
 
-    printf("Requesting bank number/n");
+    printf("Requesting bank number\n");
 	sendData(BANKPORT, bankName, marshalMathers);
 	
 	char newNum[20];
-	sprintf(newNum, "%s", message); // seems pointless, as message should be empty
+	//sprintf(newNum, "%s", message); // seems pointless, as message should be empty
 	newNum[19] = '\0';
+    
 	char numCoin[12];
 	sprintf(numCoin, "%010d\n", 0);
 	message = newNum;
@@ -109,7 +110,7 @@ int buy_eCent() {
     char myNameIs[50];
     myIP(myNameIs);
     
-    printf(" my hostname: %s\n", myNameIs);
+    printf("my hostname: %s\n", myNameIs);
     
 	char bID[20];
 	fgets(bID, 20, wallet);
@@ -117,9 +118,9 @@ int buy_eCent() {
 	message = bID;
 	sprintf(type, "collect%s", message);
     
-    printf("message before hsotname: %s", message);
+    printf("message before hsotname: %s\n", message);
     
-    sprintf(message, "%s", type);
+    sprintf(message, "%s192.168.1.10", type, myIP);
     
     printf("message Sent: %s", message);
     

@@ -103,7 +103,6 @@ int receiveData(char* port, char* receivedMessage) {
     
     printf("listener: packet is %d bytes long\n", numbytes);
     buf[numbytes] = '\0';
-    printf("listener: packet contains \"%s\"\n", buf);
     
     memcpy(receivedMessage, buf, numbytes+1);
     
