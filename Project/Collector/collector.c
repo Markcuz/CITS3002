@@ -184,7 +184,7 @@ int sending(int data, char* message) {
 	sprintf(witCoin+30,"%s", message);
 	witCoin[-1] ='\0';
 	message = witCoin;*/
-	
+	printf("WALLET_SIZE: %d\n", z);
 	sprintf(walSize, "%010d", z);
 	fseek(wallet, 19, SEEK_SET);
 	fwrite(&walSize, 10, 1, wallet);
