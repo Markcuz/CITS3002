@@ -12,7 +12,7 @@
 
 #define ADD_ANALYST "add_analyst"
 #define TO_ANALYST "to_analyst"
-#define TO_COLLECTOR "to_collector"
+#define TO_COLLECTOR "to_collect"
 
 char* directorName;
 char* bankName;
