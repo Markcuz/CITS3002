@@ -38,45 +38,44 @@ int receiveDataToProcess() {
     printf("Received message: %s\n", recMessage);
     
     char* collName = malloc(100 * sizeof(char));
-    char* colMessage = malloc(100 * sizeof(char));
+
     
 	char* dN = strstr(recMessage, TO_ANALYST);
-	char* dirName = dN+(strlen(TO_ANALYST));
-    
+	char* dirName = dN+(strlen(TO_ANALYST));// actually the collector's IP
+	char colMessage[(strlen(recmessage)-strlen(dN) - 29)];
+	strncpy(colMessage, recMessage+29, sizeof(colMessage));
     printf("dN: %s\n", dN);
     printf("dirName: %s\n", dirName);
+    sprintf(collName, "%s", dirName);
     
-    free(recMessage);
 		
-	char coinN[30];
-	strcpy(coinN, colMessage);
+	
     
     //splitting up the message into eCent and message (after stripping layers)
-    char* payment = malloc(100 * sizeof(char));//format(ownerBankID, coinID)
+	char payment[29];//format(ownerBankID, coinID)
     
     //have to check this
     strncpy(payment, recMessage,29);
     printf("PaymentCheck: %s\n", payment);// Checking that the payment is right on this side of the bank
     
     char* message = malloc(100 * sizeof(char));//DATA
-    
+    free(recMessage)
     //on successful deposit
     if(depositPayment(payment)==0) {
         processData(message,collName);
         free(collName);
-        free(colMessage);
         free (message);
-        free(payment);
+        
         return 0;
     }
 
     else {
-        char failMessage[]="failure";
+      char failMessage[8+strlen(collName)];
+      sprintf(failMessage, "failure%s",collName);
         sendData(DIRECTORPORT, directorName, failMessage);
         free(collName);
-        free(colMessage);
         free (message);
-        free(payment);
+        
         return 1;
     }
     return 1;
