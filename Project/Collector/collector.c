@@ -136,7 +136,7 @@ int buy_eCent() {
 	receiveeCent();
 	fclose(wallet);
     
-    free(message);
+  
 
     return 0;
 }
