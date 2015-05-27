@@ -192,6 +192,7 @@ int sending(int data, char* message) {
 	char coinID[11];
 	fread(coinID, 10, 1, wallet);
 	coinID[10] = '\0';
+	printf("COINID: %s\n", coinID);
 	sprintf(witCoin,"%s%s%s", myID, coinID, message);
     printf("WITCOIN: %s\n", witCoin);
 	witCoin[-1] ='\0';
