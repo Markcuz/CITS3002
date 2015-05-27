@@ -62,7 +62,7 @@ int receiveDataToProcess() {
     free(recMessage)
     //on successful deposit
     if(depositPayment(payment)==0) {
-        processData(message,collName);
+        processData(colMessage,collName);
         free(collName);
         free (message);
         
