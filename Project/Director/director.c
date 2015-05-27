@@ -99,7 +99,7 @@ int forwardingToCollector(char* recMessage) {
     char* toName = junk+strlen(TO_COLLECT)+2;
     
     printf("sendingTo: %s", toName);
-    sendData(DIRECTORPORT, toName, recMessage);
+    sendData(DIRECTORPORT, toName, sendString);
     return 0;
 }
 
