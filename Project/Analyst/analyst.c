@@ -42,7 +42,7 @@ int receiveDataToProcess() {
     
 	char* dN = strstr(recMessage, TO_ANALYST);
 	char* dirName = dN+(strlen(TO_ANALYST));// actually the collector's IP
-	char colMessage[(strlen(recmessage)-strlen(dN) - 29)];
+	char colMessage[(strlen(recMessage)-strlen(dN) - 29)];
 	strncpy(colMessage, recMessage+29, sizeof(colMessage));
     printf("dN: %s\n", dN);
     printf("dirName: %s\n", dirName);
@@ -59,7 +59,7 @@ int receiveDataToProcess() {
     printf("PaymentCheck: %s\n", payment);// Checking that the payment is right on this side of the bank
     
     char* message = malloc(100 * sizeof(char));//DATA
-    free(recMessage)
+    free(recMessage);
     //on successful deposit
     if(depositPayment(payment)==0) {
         processData(colMessage,collName);
