@@ -136,7 +136,7 @@ int buy_eCent() {
 	receiveeCent();
 	fclose(wallet);
     
-  
+   
 
     return 0;
 }
@@ -158,6 +158,7 @@ int sending(int data, char* message) {
      //somethign to put together encrypted stirng
     //adding encryption from Collector to Director (CD)
 	char myID[20];
+	char walSize[11];
 	char witCoin[strlen(message) + 30];
 	FILE *wallet;
 	wallet = fopen("byteCoin", "r+");
@@ -165,14 +166,14 @@ int sending(int data, char* message) {
 		buy_eCent();
 		wallet = fopen("byteCoin", "r+");
 	}
-	fseek(wallet, 19, SEEK_SET);
-	fgets(witCoin, 11, wallet);
-	if(atoi(witCoin) == 0){
+	fread(&myID, 19, 1, wallet);
+	fread(&walSize, 10,1, wallet);
+	if(atoi(walSize) == 0){
 		buy_eCent();
-		fseek(wallet, 20, SEEK_SET);
-		fgets(witCoin, 11, wallet);
+		fseek(wallet, 19, SEEK_SET);
+		fgets(&walSize, 10, wallet);
 	}
-	int z = atoi(witCoin);
+	int z = atoi(walSize);
 	z--;/*
 	sprintf(witCoin, "%010d\n", z);
 	fread(myID, 20, 1, wallet);
@@ -184,9 +185,9 @@ int sending(int data, char* message) {
 	witCoin[-1] ='\0';
 	message = witCoin;*/
 	
-	sprintf(witCoin, "%010d\n", z);
-	fread(myID, 20, 1, wallet);
-	fwrite(witCoin, 11, 1, wallet);
+	sprintf(walSize, "%010d", z);
+	fseek(wallet, 19, SEEK_SET);
+	fwrite(&walSize, 10, 1, wallet);
 	fseek(wallet, z*(11), SEEK_CUR);
 	char coinID[11];
 	fread(coinID, 10, 1, wallet);
