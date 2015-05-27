@@ -171,7 +171,7 @@ int sending(int data, char* message) {
 	if(atoi(walSize) == 0){
 		buy_eCent();
 		fseek(wallet, 19, SEEK_SET);
-		fread(&walSize, 10, wallet);
+		fread(&walSize, 10,1, wallet);
 	}
 	int z = atoi(walSize);
 	z--;/*
