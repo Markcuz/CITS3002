@@ -121,7 +121,7 @@ int buy_eCent() {
 	fgets(bID, 20, wallet);
 	sprintf(bID, "%019d", 1);
 	message = bID;
-	sprintf(type, "collect%s", msg);
+	sprintf(type, "collect%s", message);
 	printf("CheckThing%s\n", type);
 	
     //MATTHEW FITZPATRICK
