@@ -37,7 +37,7 @@ int receiveDataToProcess() {
     receiveData(DIRECTORPORT, recMessage);
     printf("Received message: %s\n", recMessage);
     
-    char* collName = malloc(100 * sizeof(char));
+    char collName[100];
 
     
 	char* dN = strstr(recMessage, TO_ANALYST);
