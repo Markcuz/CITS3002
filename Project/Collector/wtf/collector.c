@@ -12,9 +12,7 @@
 int showData(){
     FILE *listData;
     FILE *wallet =fopen("byteCoin", "r");
-    listData= fopen("endUser", "w+");
-    //	if(listData == NULL){return 1;}
-    fseek(listData, sizeof(int), SEEK_SET);
+    listData= fopen("endUser", "r+");
     char buff[100];
     while(fgets(buff, 100, listData) != NULL){
         printf("%s\n", buff);
@@ -23,6 +21,8 @@ int showData(){
     while(fgets(buff, 100, wallet) != NULL){
         printf("%s\n", buff);
     }
+    fclose(listData);
+    fclose(wallet);
     return 0;
 }
 /**
@@ -255,8 +255,8 @@ int checkDirector(char type) {
     
 	char recMesg[100];
     receiveData(DIRECTORPORT, recMesg);
-//	SSL_read(recMesg, decMesg);
-	
+    
+    printf("got to here");
 	char sucS[] = "success";
 	if(strcmp(recMesg, sucS) == 0){//change to decMesg once decryption's up
         return 0;
@@ -275,33 +275,24 @@ int checkDirector(char type) {
  */
 int receivingData() {
 	FILE *listData;
-	int list;
-	listData = fopen("endUser", "r+");
+	listData = fopen("endUser", "a");
+    
 	if(listData == NULL){
 		listData = fopen("endUser", "w+");
-		list = 0;
-		fwrite(&list, sizeof(int), 1, listData);
-	}
-    
-	else{
-        fread(&list, sizeof(int), 1, listData);
     }
 	char datalink[200];
-	char* gotData;
-	gotData = datalink;
+
 	char* message;
-	receiveData(DIRECTORPORT, gotData);
-//	SSL_read(gotData, message, strlen(gotData));
-	fseek(listData, list*strlen(message), SEEK_CUR);
-	list++;
-	fwrite(&message, strlen(message), 1, listData);
-	fseek(listData, 0, SEEK_SET);
-	fwrite(&list, sizeof(int), 1, listData);
+    message = datalink;
+	receiveData(DIRECTORPORT, message);
+
+	fwrite(message, strlen(message), 1, listData);
+    
+    fwrite("\n",sizeof(char),1, listData);
+
 	fclose(listData);
 	return 0;
 }
-
-
 
 /**
  * the main function

@@ -51,8 +51,8 @@ int receiveDataToProcess() {
     
     //splitting up the message into eCent and message (after stripping layers)
 	char payment[30];//format(ownerBankID, coinID)
-    colMessage[-1] ='\0';
-    printf("%s\n", colMessage);
+    colMessage[(strlen(recMessage)-strlen(dN) - 28)-1] ='\0';
+    printf("collector message: %s\n", colMessage);
     //have to check this
     strncpy(payment, recMessage,29);
     payment[29] = '\0';
@@ -85,9 +85,10 @@ int receiveDataToProcess() {
 int processData(char* message, char* collName) {
     printf("Processing data\n");
     char sendMessage[256];
-    char dMesg[strlen(message)];
+    char dMesg[strlen(message)+1];
     sprintf(dMesg, "%s", message);
-    dMesg[-1] = '\0';
+    
+   // dMesg[strlen(message)-1] = '\0';
     sprintf(sendMessage, "%s%d%s%s", dMesg, serviceType, TO_COLLECTOR, collName);
     printf("Sending Message: %s\n", sendMessage);
     

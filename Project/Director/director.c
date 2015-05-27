@@ -88,17 +88,18 @@ int checkType(char* message){
 int forwardingToCollector(char* recMessage) {
     char *junk;
     junk = strstr(recMessage, TO_COLLECT);
+    printf("junk: %s", junk);
     
     int len = strlen(recMessage)-strlen(junk);
     char sendString[1+len];
     
     strncpy(sendString, recMessage, len);
-    sendString[-1] = '\0';
+    sendString[len] = '\0';
     fprintf(stdout, "Sending message: %s\n", sendString);
     
     char* toName = junk+strlen(TO_COLLECT);
     
-    printf("sendingTo: %s", toName);
+    printf("sendingTo: %s\n", toName);
     sendData(DIRECTORPORT, toName, sendString);
     return 0;
 }
