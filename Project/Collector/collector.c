@@ -125,9 +125,9 @@ int buy_eCent() {
 	message = bID;
 	sprintf(type, "collect%s", message);
 	printf("CheckThing%s\n", type);
-	
+	message = mesgB;
     //MATTHEW FITZPATRICK
-    sprintf(message, "%shi %s", type, myNameIs);
+    sprintf(message, "%s%s", type, myNameIs);
     
     printf("message Sent: %s", message);
     
