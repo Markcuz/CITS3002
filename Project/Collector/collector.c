@@ -120,8 +120,8 @@ int buy_eCent() {
     printf("my hostname: %s\n", myNameIs);
     
 	char bID[20];
-	fgets(bID, 20, wallet);
-	sprintf(bID, "%019d", 1);
+	fread(&bID, 19,1, wallet);
+	bID[19] = '\0';
 	message = bID;
 	sprintf(type, "collect%s", message);
 	printf("CheckThing%s\n", type);
@@ -174,18 +174,10 @@ int sending(int data, char* message) {
 		fread(&walSize, 10,1, wallet);
 	}
 	int z = atoi(walSize);
-	z--;/*
-	sprintf(witCoin, "%010d\n", z);
-	fread(myID, 20, 1, wallet);
-	fwrite(witCoin, 11, 1, wallet);
-	fseek(wallet, z*(11), SEEK_CUR);
-	sprintf(witCoin,"%s", myID);
-	fread(witCoin+19, 10, 1, wallet);
-	sprintf(witCoin+30,"%s", message);
-	witCoin[-1] ='\0';
-	message = witCoin;*/
-	printf("WALLET_SIZE: %d\n", z);
+	z--;
+	
 	sprintf(walSize, "%010d", z);
+	printf("WALLET_SIZE: %d\n", z);
 	fseek(wallet, 19, SEEK_SET);
 	fwrite(&walSize, 10, 1, wallet);
 	fseek(wallet, z*(11), SEEK_CUR);
@@ -194,7 +186,7 @@ int sending(int data, char* message) {
 	coinID[10] = '\0';
 	printf("COINID: %s\n", coinID);
 	sprintf(witCoin,"%s%s%s", myID, coinID, message);
-    printf("WITCOIN: %s\n", witCoin);
+	printf("WITCOIN: %s\n", witCoin);
 	witCoin[-1] ='\0';
 	message = witCoin;
 
