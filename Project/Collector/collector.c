@@ -40,6 +40,12 @@ int getBankNumber(){
 	
 	fwrite(message, 19, 1, wallet);
 	fwrite(&numCoin, 12, 1, wallet);
+    
+    char TESTCHAR[20];
+    fseek(wallet, 0, SEEK_SET);
+    fread(&TESTCHAR, 19, 1, wallet);
+    TESTCHAR[19] = '\0';
+    printf("WALLET: %s\n",TESTCHAR);
 
 	fclose(wallet);
 	return 0;
@@ -97,7 +103,7 @@ int receiveeCent(){
  * receives the eCent
  */
 int buy_eCent() {
-    char* message;
+    char message[200];
 	FILE *wallet; 
 
 	wallet = fopen("byteCoin", "r+");//opening hard storage of eCent numbers
@@ -118,9 +124,8 @@ int buy_eCent() {
 	message = bID;
 	sprintf(type, "collect%s", message);
     
-    printf("message before hsotname: %s\n", message);
-    
-    sprintf(message, "%s192.168.1.10", type, myIP);
+    //MATTHEW FITZPATRICK
+    sprintf(message, "%shi %s", type, myNameIs);
     
     printf("message Sent: %s", message);
     
@@ -128,6 +133,8 @@ int buy_eCent() {
 	sendData(BANKPORT, bankName, message);
 	receiveeCent();
 	fclose(wallet);
+    
+    free(message);
 
     return 0;
 }
@@ -183,27 +190,21 @@ int sending(int data, char* message) {
 	fread(coinID, 10, 1, wallet);
 	coinID[10] = '\0';
 	sprintf(witCoin,"%s%s%s", myID, coinID, message);
+    printf("WITCOIN: %s\n", witCoin);
 	witCoin[-1] ='\0';
 	message = witCoin;
 
     
     fclose(wallet);
     
-//	encrypt_CA(message);
-//	SSL_CA(message);
-    
 	char myname[50];
 	myIP(myname);
 	char outerLayer[strlen(message)+strlen(myname)+9];
-	sprintf(outerLayer, "%dto_analyst%s%s",data, message, myname);
+	sprintf(outerLayer, "%d%sto_analyst%s",data, message, myname);
 
 	message = outerLayer;
 	
     printf("sending: %s", message);
-//    encrypt_CD(message);
-    
-    //adding SSL from Collector to Director
-//    SSL_CD(message);
     
     usleep(1000000);
     if(sendData(DIRECTORPORT, directorName, message)==0) {

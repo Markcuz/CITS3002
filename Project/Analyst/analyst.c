@@ -43,6 +43,9 @@ int receiveDataToProcess() {
 	char* dN = strstr(recMessage, TO_ANALYST);
 	char* dirName = dN+(strlen(TO_ANALYST));
     
+    printf("dN: %s\n", dN);
+    printf("dirName: %s\n", dirName);
+    
     free(recMessage);
 		
 	char coinN[30];
