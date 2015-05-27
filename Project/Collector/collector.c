@@ -13,8 +13,6 @@ int showData(){
     FILE *listData;
     FILE *wallet =fopen("byteCoin", "r");
     listData= fopen("endUser", "w+");
-    //	if(listData == NULL){return 1;}
-    fseek(listData, sizeof(int), SEEK_SET);
     char buff[100];
     while(fgets(buff, 100, listData) != NULL){
         printf("%s\n", buff);
