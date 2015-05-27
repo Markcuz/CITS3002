@@ -105,7 +105,6 @@ int receiveeCent(){
 int buy_eCent() {
     char message[200];
 	FILE *wallet; 
-	char* msg;
 	wallet = fopen("byteCoin", "r+");//opening hard storage of eCent numbers
 	char type[27];
 	if(wallet == NULL){
@@ -121,7 +120,7 @@ int buy_eCent() {
 	char bID[20];
 	fgets(bID, 20, wallet);
 	sprintf(bID, "%019d", 1);
-	msg = bID;
+	message = bID;
 	sprintf(type, "collect%s", msg);
 	printf("CheckThing%s\n", type);
 	
