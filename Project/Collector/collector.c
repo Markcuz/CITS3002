@@ -103,7 +103,9 @@ int receiveeCent(){
  * receives the eCent
  */
 int buy_eCent() {
-    char message[200];
+  char mesgB[200];
+    char* message;
+    message= mesgB;
 	FILE *wallet; 
 	wallet = fopen("byteCoin", "r+");//opening hard storage of eCent numbers
 	char type[27];
@@ -268,7 +270,9 @@ int receivingData() {
 	else{
         fread(&list, sizeof(int), 1, listData);
     }
+	char datalink[200];
 	char* gotData;
+	gotData = datalink;
 	char* message;
 	receiveData(DIRECTORPORT, gotData);
 //	SSL_read(gotData, message, strlen(gotData));
