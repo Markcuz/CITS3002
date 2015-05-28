@@ -63,9 +63,6 @@ int sendData(char* port, char* hostname, char* msg)
 {   SSL_CTX *ctx;
     int server;
     SSL *ssl;
-    char buf[1024];
-    int bytes;
-
 
     SSL_library_init();
 
