@@ -62,7 +62,6 @@ int getBankNumber(){
     sendData(BANKPORT, bankName, marshalMathers);
     
     char newNum[20];
-    //sprintf(newNum, "%s", message); // seems pointless, as message should be empty
     newNum[19] = '\0';
     
     char numCoin[12];
@@ -70,11 +69,7 @@ int getBankNumber(){
     message = newNum;
     wallet = fopen("byteCoin", "w+");
     
-    printf("Receiving bank number\n");
     receiveData(BANKPORT, message);
-    printf("Got number!");
-    printf("\nNumber is: %s\n", message);
-    
     fwrite(message, 19, 1, wallet);
     fwrite(&numCoin, 12, 1, wallet);
     
@@ -82,8 +77,6 @@ int getBankNumber(){
     fseek(wallet, 0, SEEK_SET);
     fread(&TESTCHAR, 19, 1, wallet);
     TESTCHAR[19] = '\0';
-    printf("WALLET: %s\n",TESTCHAR);
-    
     fclose(wallet);
     return 0;
 }
@@ -100,8 +93,6 @@ int receiveeCent(){
     
     
     receiveData(BANKPORT, message);
-    printf("Received eCent: %s\n", message);
-    
     FILE *wallet;
     wallet = fopen("byteCoin", "r+");
     
@@ -110,24 +101,21 @@ int receiveeCent(){
     }
     
     fseek(wallet, 29, SEEK_SET);
-    //	decrypt_BC(message);
     char* noDosh = "NO SOUP FOR YOU!";
     char* badID = "Bad ID";
     
-    if(strcmp(message, noDosh) == 0){//or something
-        // wait a bit and try again
-        return 2;
+    if(strcmp(message, noDosh) == 0){
+        return 2;// indicating bank has no reserve of eCents left
     }
     
     else if(strcmp(message, badID) == 0){
         // indicating badID
-        //Try again.
         return 3;
     }
     
-    fwrite(&coin, sizeof(coin), 1, wallet);
+    fwrite(&coin, sizeof(coin), 1, wallet);//writing eCents to wallet
     fseek(wallet, 19, SEEK_SET);
-    sprintf(coin, "%010d", 10);
+    sprintf(coin, "%010d", 10);//number of stored ecents
     fwrite(&coin, 10, 1, wallet);
     fclose(wallet);
     
@@ -140,7 +128,7 @@ int receiveeCent(){
  * receives the eCent
  */
 int buy_eCent() {
-    char mesgB[200];
+    char mesgB[200];//memory for message to Bank
     char* message;
     message= mesgB;
     FILE *wallet;
@@ -157,16 +145,13 @@ int buy_eCent() {
     printf("my hostname: %s\n", myNameIs);
     
     char bID[20];
-    fread(&bID, 19,1, wallet);
+    fread(&bID, 19,1, wallet);//bank number
     bID[19] = '\0';
     message = bID;
     sprintf(type, "collect%s", message);
-    printf("CheckThing%s\n", type);
     message = mesgB;
-    //MATTHEW FITZPATRICK
     sprintf(message, "%s%s", type, myNameIs);
-    
-    printf("message Sent: %s", message);
+
     
     usleep(100000);
     sendData(BANKPORT, bankName, message);
@@ -184,16 +169,14 @@ int buy_eCent() {
  */
 int sending(char* data, char* message) {
     char daType = data[0];
-    //need to check the director
+    //need to check if the director has an analyst of the correct type
     if(checkDirector(daType) != 0) {
         printf("Not valid type");
         return 1;
-        //wait for a while? until director has an analyst?
+        
     }
     
-    //add something to front of string to identify a data exchange
-    //somethign to put together encrypted stirng
-    //adding encryption from Collector to Director (CD)
+    
     char myID[20];
     char walSize[11];
     char witCoin[strlen(message) + 30];
@@ -205,7 +188,7 @@ int sending(char* data, char* message) {
         wallet = fopen("byteCoin", "r+");
     }
     fread(&myID, 19, 1, wallet);
-    fread(&walSize, 10,1, wallet);
+    fread(&walSize, 10,1, wallet);//using wallet as a stack
     if(atoi(walSize) == 0){
         buy_eCent();
         fseek(wallet, 19, SEEK_SET);
@@ -215,31 +198,24 @@ int sending(char* data, char* message) {
     z--;
     
     sprintf(walSize, "%010d", z);
-    printf("WALLET_SIZE: %d\n", z);
     fseek(wallet, 19, SEEK_SET);
     fwrite(&walSize, 10, 1, wallet);
     fseek(wallet, z*(10), SEEK_CUR);
     char coinID[11];
     fread(coinID, 10, 1, wallet);
     coinID[10] = '\0';
-    printf("COINID: %s\n", coinID);
     sprintf(witCoin,"%s%s%s", myID, coinID, message);
-    printf("WITCOIN: %s\n", witCoin);
     witCoin[-1] ='\0';
     message = witCoin;
     
     
     fclose(wallet);
-    
     char myname[50];
     myIP(myname);
-    char outerLayer[strlen(message)+strlen(myname)+9];
+    char outerLayer[strlen(message)+strlen(myname)+9]; 
     sprintf(outerLayer, "%c%sto_analyst%s",daType, message, myname);
     
     message = outerLayer;
-    
-    printf("sending: %s", message);
-    
     usleep(1000000);
     if(sendData(DIRECTORPORT, directorName, message)==0) {
         printf("Sent data");
@@ -260,22 +236,19 @@ int sending(char* data, char* message) {
  * returns 0 on success, 1 on failure
  */
 int checkDirector(char type) {
-    //something to send to Director to identify the request
     char myName[50];
     myIP(myName);
     
     char message[100];
     sprintf(message, "%c%s%s", type, CHECK_TYPE, myName);
-    printf("Sending message: %s\n", message);
     
     sendData(DIRECTORPORT, directorName, message);
     
     char recMesg[100];
     receiveData(DIRECTORPORT, recMesg);
-    //	SSL_read(recMesg, decMesg);
     
     char sucS[] = "success";
-    if(strcmp(recMesg, sucS) == 0){//change to decMesg once decryption's up
+    if(strcmp(recMesg, sucS) == 0){
         return 0;
     }
     else{
@@ -298,15 +271,11 @@ int receivingData() {
         listData = fopen("endUser", "w+");
     }
     char datalink[200];
-    
     char* message;
     message = datalink;
     receiveData(DIRECTORPORT, message);
-    
     fwrite(message, strlen(message), 1, listData);
-    
     fwrite("\n",sizeof(char),1, listData);
-    
     fclose(listData);
     return 0;
 }
@@ -329,13 +298,13 @@ int main(int argc, char* argv[]) {
     directorName = argv[1];
     bankName = argv[2];
     
-    printf("getting bank no.\n");
+    
     getBankNumber();
-    printf("got bank no.\n\n");
+    
     
     int i;
-    for(i=0; i<atoi(argv[3]); i++) {
-        printf("buying eCent package no. %d\n", 1);
+    for(i=0; i<atoi(argv[3]); i++) {//designed to allow for larger wallet sizes Present funcionality limits size to 1
+        printf("buying eCent package no. %d\n", (i+1));
         usleep(10000);
         buy_eCent();
     }
@@ -347,12 +316,12 @@ int main(int argc, char* argv[]) {
         printf("type:   ");
         scanf("%s", type);
         if(strlen(type )!= 1){
-            printf("Ending collector script. Printing received messages\n\n");
-            showData();
+            printf("Ending collector script.\n\n");
+            //showData(); 
             return 0;
         }
         
-        //checkdirector
+        
         printf("message:    ");
         scanf("%s", message);
         
@@ -362,7 +331,7 @@ int main(int argc, char* argv[]) {
         continue;
     }
     
-    showData();
+    
     return 0;
 }
 
