@@ -6,7 +6,7 @@
  * \author Marcus Pham 20495924 (debugging and skeleton)
  */
 
-//the banks own ID
+//the banks own ID. Reserved to note reserve of eCents
 char banksID[20] = "0000000000000000000";
 
 /**
@@ -29,11 +29,10 @@ void econStart(){
 		eCent cent;
 		cent.identifier = i;
 		strcpy(cent.owner, banksID); //reserved bank ID
-        
 		fwrite(&cent, sizeof(eCent), 1, centBanked);
-    }
+    	}
     
-    //only did two for loops due to seg fault on MACOSX
+    //Did two 'for' loops due to seg fault on MACOSX
     for(int i = 0; i < a; i++){
         eCent cent2;
         cent2.identifier = i;
@@ -53,12 +52,8 @@ void econStart(){
  * Sent message: "Well done you" on success, "You dun goofed, son" on failure
  */
 int checkDeposit(char* recMessage, char* fromName){
-    
-    printf("checking deposit");
-	
-    char oldID[20];
+	 char oldID[20];
 	char centS[11];
-
 	strncpy(oldID,recMessage+7, 19);
 	oldID[19]= '\0';
 	strncpy(centS, recMessage+26, 10);
@@ -72,28 +67,28 @@ int checkDeposit(char* recMessage, char* fromName){
 		econStart();
 		centList = fopen("centBank", "r+");
 	}
-    char accept[] = "Well done you";
-    char decline[] = "You dun goofed, son.";// Nack message;
+	char accept[] = "Well done you";
+    	char decline[] = "You dun goofed, son.";// Nack message;
     
 	eCent cent;
 	fseek(centList, centID*sizeof(eCent), SEEK_SET);
 	fread(&cent, sizeof(eCent),1, centList);
 	if((strcmp(cent.owner, oldID)==0) && (strcmp(cent.owner, banksID)!=0)){ //got the correct previous owner
 		strcpy(cent.owner, banksID);
-    	fseek(centList, centID*sizeof(eCent), SEEK_SET);
+	    	fseek(centList, centID*sizeof(eCent), SEEK_SET);
 		fwrite(&cent, sizeof(eCent), 1, centList); //updating owner to bank.
 		fclose(centList); 
-    	FILE *centBanked = fopen("centdepot", "r+"); //storing the eCent with the rest of the bank's cache.
+	    	FILE *centBanked = fopen("centdepot", "r+"); //storing the eCent with the rest of the bank's cache.
 		int stash; //number of stored eCents
 		fread(&stash, sizeof(int), 1, centBanked);
-        fseek(centBanked, stash*sizeof(eCent), SEEK_CUR); //to the stored eCents stack
-    	fwrite(&cent, sizeof(eCent), 1, centBanked); //pushing to top of stack
-        fseek(centBanked, 0, SEEK_SET);//back to storage number
-        stash++;
+	        fseek(centBanked, stash*sizeof(eCent), SEEK_CUR); //to the stored eCents stack
+	    	fwrite(&cent, sizeof(eCent), 1, centBanked); //pushing to top of stack
+	        fseek(centBanked, 0, SEEK_SET);//back to storage number
+	        stash++;
 		fwrite(&stash, sizeof(int), 1, centBanked); //updating number of stored eCents
 		fclose(centBanked);
-
-        sendMessage = accept; //something something ack message;
+	
+	        sendMessage = accept; //something something ack message;
 	}
 	else{
 		
@@ -102,7 +97,6 @@ int checkDeposit(char* recMessage, char* fromName){
 	
     usleep(1000000);
 	sendData(BANKPORT, fromName, sendMessage);
-	printf("%s\n", sendMessage);
 	return 0;
 }
 
@@ -116,7 +110,7 @@ int givePayment(char* recMessage, char* fromName) {
 		econStart();
 		centBanked = fopen("centdepot","r+");
 	}
-	char ownID[20];
+	char ownID[20];//owner ID
 	strncpy(ownID,recMessage+7, 19);
 	ownID[19] = '\0';
 	int a =0;
@@ -131,21 +125,19 @@ int givePayment(char* recMessage, char* fromName) {
 	}
     
 	else {
-		char* badID = "Bad ID";
-		char* ssld;
-		//SSL_write(ssld, badID, strlen(badID));
+		char badID[] = "Bad ID";
+		char* ssld;//in expectation of SSL method
+		ssld = badID;
 		sendData(BANKPORT, fromName, ssld);
-		printf("%s\n",badID);
 		return 0;
 	}
 	fread(&a, sizeof(int), 1, centBanked);
 	if(a == 0){ // Game Over. Insert coin/s to continue.
 		fclose(centBanked);
 		char noDosh[] = "No soup for you!";
-		char* failstring; //gotta code something here;
-		//SSL_write(failstring, &noDosh, strlen(noDosh));
+		char* failstring;
+		failstring = noDosh;
 		sendData(BANKPORT, fromName, failstring);
-		//alt = issue new(similar to econ start, but issues a new 10000 ecents
 		return 0;
 	}
 	else if(a>10){ //more than enough cents to go around
@@ -153,16 +145,15 @@ int givePayment(char* recMessage, char* fromName) {
 		int bd = a - 10;
 		fwrite(&bd, sizeof(int), 1, centBanked); // Update
 		fseek(centBanked, bd*(sizeof(eCent)), SEEK_CUR); //jumpt to almost end of list
-		a=10; //sending default amount of 10 for now. 
-//Will add something to allow for the collector to specify a number of eCents to obtain
+		a=10; //sending default amount of 10
+
 	}	
 	else{ // either just enough, or not quite enough
 		fseek(centBanked, 0, SEEK_SET);
-		int bd = 0; //'t weren't empty before, but it sure is now.
+		int bd = 0; //i't wasn't empty before, but it sure is now.
 		fwrite(&bd, sizeof(int),1,centBanked); //update
 	}
-    
-	printf("ISA%d\n",a);
+	
 	eCent cent;
 	char* sendMessage;
 	char cents[a*11 +1]; // compilation of the eCent IDs.
@@ -182,10 +173,8 @@ int givePayment(char* recMessage, char* fromName) {
 	
 	fclose(centBanked);
 	fclose(centList);
-    printf("fromName: ..%s..\n", fromName);
     
    	sendMessage = cents;
-    printf("CASH: %s\n", sendMessage);
 
     usleep(100000);
 	sendData(BANKPORT, fromName, sendMessage);
@@ -198,7 +187,7 @@ int givePayment(char* recMessage, char* fromName) {
  * Send Message: the ID of the bank
  */
 int giveAccount(char* fromName){
-	FILE *lastAcc = fopen("bankAcc", "r+");
+	FILE *lastAcc = fopen("bankAcc", "r+");// last account to have been created
     
 	if(lastAcc == NULL){
 		econStart();
@@ -209,18 +198,15 @@ int giveAccount(char* fromName){
 	nID+=1;
 	char acnum[20];
 	sprintf(acnum, "%019d", nID);
-	printf("lastAcc%d\n", nID);
 	fseek(lastAcc,0, SEEK_SET);
 	fwrite(&nID, sizeof(int), 1, lastAcc);
 	
 	fseek(lastAcc,0, SEEK_SET);
 	fread(&nID,sizeof(int), 1, lastAcc);
-	printf("lastacc%d\n", nID);
     
-    //sending is being a pain
     usleep(1000000);
     
-    //WARNING need to change to fromName
+
 	sendData(BANKPORT, fromName, acnum);
 	return 0;
 }
@@ -230,11 +216,11 @@ int giveAccount(char* fromName){
  */
 int deParse(char* mesg){
 	char parse[8];
-	strncpy(parse, mesg, 7);
+	strncpy(parse, mesg, 7);//message header contains 7 byte code corresponding to desired transaction type
 	parse[7] = '\0';
 	char an[] = "deposit";
 	char col[] ="collect";
-	char acc[] ="initial";
+	char acc[] ="initial";//A collector wants to create a new bank account
 
 	if(strcmp(parse, an) == 0){
         return 0;
@@ -258,14 +244,9 @@ int deParse(char* mesg){
  */
 char *findName(char* recMessage, int cas){
     char* name;
-    
     char serName[100];
-    
     strcpy(serName,recMessage+cas);
-    
     name = &serName[0];
-    
-    printf("name: %s \n", name);
     return name;
 }
 
@@ -280,7 +261,6 @@ int receiveBankMessage() {
 	char* recMessage; // for received transmission
 	recMessage = deMec;
 	receiveData(BANKPORT, recMessage);
-	//sprintf(deMec, "%s\n\n\nTHAT'S ALL FOLKS\n", recMessage);
 	recMessage = deMec;
 	int deposit = deParse(recMessage);
 	char* fromName;
