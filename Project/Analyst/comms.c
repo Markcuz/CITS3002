@@ -2,7 +2,7 @@
 //gcc -lssl -lcrypto <name.c> -o <out name>
 
 #include "comms.h"
-
+
 int OpenConnection(const char *hostname, int port)
 {   int sd;
     struct hostent *host;
@@ -50,17 +50,13 @@ void ShowCerts(SSL* ssl)
     cert = SSL_get_peer_certificate(ssl); /* get the server's certificate */
     if ( cert != NULL )
     {
-        printf("Server certificates:\n");
         line = X509_NAME_oneline(X509_get_subject_name(cert), 0, 0);
-        printf("Subject: %s\n", line);
         free(line);       /* free the malloc'ed string */
         line = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0);
-        printf("Issuer: %s\n", line);
         free(line);       /* free the malloc'ed string */
         X509_free(cert);     /* free the malloc'ed certificate copy */
     }
-    else
-        printf("No certificates.\n");
+
 }
  
 int sendData(char* port, char* hostname, char* msg)
@@ -83,9 +79,7 @@ int sendData(char* port, char* hostname, char* msg)
 	return -1;
       }
     else
-      { 
-	
-        printf("Connected with %s encryption\n", SSL_get_cipher(ssl));
+      {
         ShowCerts(ssl);        /* get any certs */
         SSL_write(ssl, msg, strlen(msg));   /* encrypt & send message */
         SSL_free(ssl);        /* release connection state */
@@ -171,7 +165,6 @@ int receiveData(char *port, char *receivedMessage)
     struct sockaddr_in addr;
     socklen_t len = sizeof(addr);
     SSL *ssl;
-    printf("Here1\n");
     int client = accept(server, (struct sockaddr*)&addr, &len);  /* accept connection as usual */
 
     ssl = SSL_new(ctx);              /* get new SSL state with context */
@@ -193,11 +186,8 @@ int receiveData(char *port, char *receivedMessage)
             //strlen append after bytes 
             buf[bytes] = '\0';
 
-	    strcpy(receivedMessage, buf);
+            strcpy(receivedMessage, buf);
             SSL_write(ssl, "Success", strlen("Success")); /* send reply */
-
-	    
-
         }
         else
             ERR_print_errors_fp(stderr);
