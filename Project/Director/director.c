@@ -22,7 +22,6 @@ int forwardingToAnalyst(char* recMessage){
     char* line = NULL;
     while((read = getline(&line,&len,table)) != -1) {
         if(line[0]==recMessage[0]) {
-            printf("found Analyst!\n");
             strtok(line, " \n");
             toName = strtok(NULL, " \n");
             break;
@@ -86,9 +85,8 @@ int checkType(char* message){
  * sending: <data>
  */
 int forwardingToCollector(char* recMessage) {
-    char *junk;
+    char *junk;//parts of the message that do not concern the analyst
     junk = strstr(recMessage, TO_COLLECT);
-    printf("junk: %s", junk);
     
     int len = strlen(recMessage)-strlen(junk);
     char sendString[1+len];
@@ -99,7 +97,6 @@ int forwardingToCollector(char* recMessage) {
     
     char* toName = junk+strlen(TO_COLLECT);
     
-    printf("sendingTo: %s\n", toName);
     sendData(DIRECTORPORT, toName, sendString);
     return 0;
 }
@@ -173,11 +170,9 @@ int receiveDirectorMessage() {
     char recMessage[200];
     receiveData(DIRECTORPORT, recMessage);
     
-    printf("Received Message: %s\n", recMessage);
     
     int messageType = deParseMessage(recMessage);
     
-    printf("Message Type: %d\n", messageType);
     
     switch(messageType) {
         case 0:
@@ -186,7 +181,6 @@ int receiveDirectorMessage() {
             break;
         case 1:
             checkType(recMessage);
-            printf("finished");
             return 0;
             break;
         case 2:
