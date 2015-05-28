@@ -56,6 +56,7 @@ int receiveData(char* port, char* receivedMessage) {
     int numbytes;
     struct sockaddr_storage their_addr;
     socklen_t addr_len;
+    char s[INET6_ADDRSTRLEN];
     char buf[MAXBUFLEN];
     
     memset(&hints, 0, sizeof hints);
@@ -106,8 +107,6 @@ int receiveData(char* port, char* receivedMessage) {
     memcpy(receivedMessage, buf, numbytes+1);
     
     printf("listener: packet contains \"%s\"\n", receivedMessage);
-    
-    printf("got to here");
     
     close(sockfd);
     

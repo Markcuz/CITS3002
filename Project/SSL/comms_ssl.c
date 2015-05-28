@@ -268,15 +268,3 @@ printf("Stuff");
 }
 
 
-
-int main()
-{
-	char * msg = "GET / HTTP/1.0\n\n";
-	int s, r;
-
-	s = sendData("44344", "127.0.0.1", msg);
-		r = receiveData("44344", msg);
-
-	printf("sendData returned %d, receiveData return %d\n", s, r);
-	return 0;
-}

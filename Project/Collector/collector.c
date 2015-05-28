@@ -5,7 +5,6 @@
  */
 #include "collector.h"
 
-
 /**
  * prints the data in the endUser file
  */

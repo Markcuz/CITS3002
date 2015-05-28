@@ -1,17 +1,5 @@
 // Written by Mitchell Poole 21212271/ March
 //gcc -lssl -lcrypto <name.c> -o <out name>
-#include <stdio.h>
-#include <errno.h>
-#include <unistd.h>
-#include <malloc.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <resolv.h>
-#include <netdb.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
- 
-#define FAIL    -1
  
 int OpenConnection(const char *hostname, int port)
 {   int sd;
@@ -221,3 +209,26 @@ int receiveData(char *port, char *receivedMessage)
     close(server);          /* close server socket */
     SSL_CTX_free(ctx);         /* release context */
 } //end of file
+
+
+int myIP(char* myIPAddr) {
+    struct ifaddrs *addrs, *tmp;
+    
+    getifaddrs(&addrs);
+    tmp = addrs;
+    
+    while (tmp){
+        if (tmp->ifa_addr && tmp->ifa_addr->sa_family == AF_INET) {
+            struct sockaddr_in *pAddr = (struct sockaddr_in *)tmp->ifa_addr;
+            if(strcmp("eth0", tmp->ifa_name)==0) {
+                strcpy(myIPAddr, inet_ntoa(pAddr->sin_addr));
+                //printf("myIP: %s", myIPAddr);
+            }
+        }
+        tmp = tmp->ifa_next;
+    }
+    
+    freeifaddrs(addrs);
+    return 0;
+}
+
