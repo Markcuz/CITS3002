@@ -197,6 +197,7 @@ int receiveData(char *port, char *receivedMessage)
     
     close(server);          /* close server socket */
     SSL_CTX_free(ctx);         /* release context */
+    return 0;
 } //end of file
 
 
