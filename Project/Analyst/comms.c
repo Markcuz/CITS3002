@@ -1,6 +1,8 @@
 // Written by Mitchell Poole 21212271/ March
 //gcc -lssl -lcrypto <name.c> -o <out name>
- 
+
+#include "comms.h"
+
 int OpenConnection(const char *hostname, int port)
 {   int sd;
     struct hostent *host;
