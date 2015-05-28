@@ -309,7 +309,7 @@ int main(int argc, char* argv[]) {
     }
     
     char type[2000];
-    char* message = malloc(100*sizeof(char));
+    char* message = malloc(1000*sizeof(char));
     
     while(1) {
         printf("type:   ");
@@ -320,8 +320,8 @@ int main(int argc, char* argv[]) {
             return 0;
         }
         
-        
-        printf("message:    ");
+
+        printf("message, without spaces:    ");
         scanf("%s", message);
         
         printf("Sending...\n\n");
