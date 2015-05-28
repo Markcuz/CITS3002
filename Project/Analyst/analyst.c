@@ -35,31 +35,26 @@ int receiveDataToProcess() {
     
     printf("Receiving data\n");
     receiveData(DIRECTORPORT, recMessage);
-    printf("Received message: %s\n", recMessage);
     
     char collName[100];
     
 	char* dN = strstr(recMessage, TO_ANALYST);
 	char* dirName = dN+(strlen(TO_ANALYST));// actually the collector's IP
 	char colMessage[(strlen(recMessage)-strlen(dN) - 28)];
-    printf("%d\n", sizeof(colMessage));
+    
 	strncpy(colMessage, recMessage+29, sizeof(colMessage)-1);
-    printf("dN: %s\n", dN);
-    printf("dirName: %s\n", dirName);
     sprintf(collName, "%s", dirName);
     
     
     //splitting up the message into eCent and message (after stripping layers)
 	char payment[30];//format(ownerBankID, coinID)
     colMessage[(strlen(recMessage)-strlen(dN) - 28)-1] ='\0';
-    printf("collector message: %s\n", colMessage);
     //have to check this
     strncpy(payment, recMessage,29);
     payment[29] = '\0';
-    printf("PaymentCheck: %s\n", payment);// Checking that the payment is right on this side of the bank
+   
     
     char* message = malloc(100 * sizeof(char));//DATA
-    //on successful deposit
     if(depositPayment(payment)==0) {
         processData(colMessage,collName);
         free (message);
@@ -90,7 +85,6 @@ int processData(char* message, char* collName) {
     
    // dMesg[strlen(message)-1] = '\0';
     sprintf(sendMessage, "%s%d%s%s", dMesg, serviceType, TO_COLLECTOR, collName);
-    printf("Sending Message: %s\n", sendMessage);
     
     sendData(DIRECTORPORT, directorName, sendMessage);
     return 0;
@@ -114,16 +108,14 @@ int depositPayment(char* payment) {
     
     
     sprintf(bMessage, "deposit%s%s",payment, name);
-    printf("bMessage check: %s\n", bMessage);
     dpayment = bMessage; // You forgot this
-    printf("sending message: %s\n", dpayment);
+    printf("sending deposit\n");
     sendData(BANKPORT, bankName, dpayment);
     
     //cehcking for the success message
     char allGood[] = "Well done you";
     char response[100];
 	receiveData(BANKPORT, response);
-    printf("reply message: %s\n", response);
     
     if(strcmp(response, allGood) == 0){
         return 0;
@@ -150,7 +142,7 @@ int main(int argc, char* argv[]) {
     bankName = argv[1];
     directorName = argv[2];
     
-    printf("Rype: %s\n", argv[3]);
+    printf("Type: %s\n", argv[3]);
     serviceType = atoi(argv[3]);
     
     printf("Registering...\n");
